@@ -1,0 +1,25 @@
+name: Deployment develop
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: SSH Deploy
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          script: |
+            cd flostream-storage
+            git pull origin develop
+            cp .env.example .env
+            yarn
+            yarn build
+            pm2 restart flostream-storage
