@@ -1,19 +1,18 @@
 import Link from 'next/link';
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import axios from 'axios';
 import moment from 'moment';
 import { ListBucketsCommand, S3Client } from '@aws-sdk/client-s3';
 
 export const Main = () => {
   const router = useRouter().pathname;
-  const [buckets, setBuckets] = useState([]);
+  const [buckets, setBuckets] = useState<any>([]);
 
-  const [awsAccessKeyId, setAwsAccessKeyId] = useState(
+  const [awsAccessKeyId, setAwsAccessKeyId] = useState<string>(
     'SKEZ6znfei9avPnqorCQ3nqLws'
   );
 
-  const [awsSecretAccessKey, setAwsSecretAccessKey] = useState(
+  const [awsSecretAccessKey, setAwsSecretAccessKey] = useState<string>(
     'bb9fd7ee7925a0420a1b54105998ab0d69fb3b567aecb8d98338b8c4ff1ef762'
   );
 
@@ -60,8 +59,8 @@ export const Main = () => {
               </tr>
             </thead>
             <tbody>
-              {buckets.map((bucket) => (
-                <tr>
+              {buckets.map((bucket: any) => (
+                <tr key={bucket?.id}>
                   <td className="border px-4 py-2">{bucket?.local_alias}</td>
                   <td className="border px-4 py-2">
                     {bucket?.endpoint_url.split('.')[1]}
