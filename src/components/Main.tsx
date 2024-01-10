@@ -8,11 +8,11 @@ export const Main = () => {
   const router = useRouter().pathname;
   const [buckets, setBuckets] = useState<any>([]);
 
-  const [awsAccessKeyId, setAwsAccessKeyId] = useState<string>(
+  const [accessKeyId, setAccessKeyId] = useState<string>(
     'SKEZ6znfei9avPnqorCQ3nqLws'
   );
 
-  const [awsSecretAccessKey, setAwsSecretAccessKey] = useState<string>(
+  const [secretAccessKey, setSecretAccessKey] = useState<string>(
     'bb9fd7ee7925a0420a1b54105998ab0d69fb3b567aecb8d98338b8c4ff1ef762'
   );
 
@@ -20,12 +20,13 @@ export const Main = () => {
     fetch('/api/list-buckets', {
       method: 'POST',
       body: JSON.stringify({
-        awsAccessKeyId,
+        accessKeyId,
+        secretAccessKey,
       }),
     })
       .then((res) => res.json())
       .then((data) => {
-        setBuckets(data.buckets);
+        setBuckets(data.Buckets);
       });
   };
 
@@ -33,17 +34,28 @@ export const Main = () => {
 
   return (
     <div id="main" className="use-tailwind">
-      <div className="flex gap-3 align-middle justify-center">
-        <label>Access Key: </label>
-        <input
-          type="text"
-          value={awsAccessKeyId}
-          className="border border-gray-400 rounded"
-          onChange={(e) => setAwsAccessKeyId(e.target.value)}
-        ></input>
+      <div className="">
+        <div>
+          <label>Access Key: </label>
+          <input
+            type="text"
+            value={accessKeyId}
+            className="border border-gray-400 rounded"
+            onChange={(e) => setAccessKeyId(e.target.value)}
+          ></input>
+        </div>
+        <div className="mt-2">
+          <label>Secret Key: </label>
+          <input
+            type="text"
+            value={secretAccessKey}
+            className="border border-gray-400 rounded"
+            onChange={(e) => setSecretAccessKey(e.target.value)}
+          ></input>
+        </div>
         <button
           onClick={() => getBuckets()}
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
+          className="mt-2 bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-2 rounded"
         >
           Get Buckets
         </button>
@@ -60,13 +72,13 @@ export const Main = () => {
             </thead>
             <tbody>
               {buckets.map((bucket: any) => (
-                <tr key={bucket?.id}>
-                  <td className="border px-4 py-2">{bucket?.local_alias}</td>
+                <tr key={bucket?.Name}>
+                  <td className="border px-4 py-2">{bucket?.Name}</td>
                   <td className="border px-4 py-2">
-                    {bucket?.endpoint_url.split('.')[1]}
+                    { process.env.NEXT_PUBLIC_FLOSTREAM_REGION }
                   </td>
                   <td className="border px-4 py-2">
-                    {moment(bucket?.updated_at).format('HH:mm DD/MM/YYYY')}
+                    {moment(bucket?.CreationDate).format('HH:mm DD/MM/YYYY')}
                   </td>
                 </tr>
               ))}
