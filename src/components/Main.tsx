@@ -18,6 +18,8 @@ export const Main = ({ dataBuckets }: any) => {
   );
 
   const getBuckets = () => {
+    sessionStorage.setItem('accessKeyId', accessKeyId);
+    sessionStorage.setItem('secretAccessKey', secretAccessKey);
 
     fetch('/api/list-buckets', {
       method: 'POST',
