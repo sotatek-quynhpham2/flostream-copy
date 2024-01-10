@@ -21,7 +21,6 @@ export default function handler(
     const getBuckets = async () => {
       try {
         const response = await s3Client.send(new ListBucketsCommand({}));
-        console.log(response);
         res.status(200).json(response);
       } catch (error) {
         res.status(500).json(error);

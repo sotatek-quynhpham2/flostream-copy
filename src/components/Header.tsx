@@ -1,11 +1,17 @@
-import Link from 'next/link'
-import React, { useEffect, useState } from 'react'
-import { useRouter } from 'next/router'
+import Link from 'next/link';
+import React from 'react';
+import Image from 'next/image';
+import FlostreamLogo from '@/assets/images/flostream-white.png';
 
 export const Header = () => {
-  const router = useRouter().pathname
-
   return (
-    <div id='header'>Header</div>
-  )
-}
+    <div
+      id="header"
+      className="flex flex-row justify-between items-center h-[60px] px-6 py-[10px] bg-[#292929]"
+    >
+      <Link href="/">
+        <Image src={FlostreamLogo} height={18} alt="FlostreamLogo" />
+      </Link>
+    </div>
+  );
+};
