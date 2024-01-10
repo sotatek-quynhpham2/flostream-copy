@@ -2,7 +2,6 @@ import Head from "next/head";
 import { useRouter } from 'next/router';
 import React from "react";
 import { Header } from "@/components/Header";
-import { Footer } from "@/components/Footer";
 
 export const DefaultLayout = ({ children }: any) => {
   const router = useRouter();
@@ -10,7 +9,6 @@ export const DefaultLayout = ({ children }: any) => {
     <div className="default-layout">
       <Header />
       <main>{children}</main>
-      <Footer />
     </div>
   );
 };
