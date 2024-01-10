@@ -3,13 +3,7 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
 
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method === 'POST') {
-    const bodyFormData = req.body;
-
-    let body: any = {};
-
-    bodyFormData.forEach((value: any, key: any) => {
-      body[key] = value;
-    });
+    const body = req.body;
 
     const s3Client = new S3Client({
       endpoint: process.env.NEXT_PUBLIC_FLOSTREAM_ENDPOINT,
