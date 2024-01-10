@@ -1,5 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { ListBucketsCommand, S3Client } from '@aws-sdk/client-s3';
+import { ListObjectsV2Command, S3Client } from '@aws-sdk/client-s3';
 
 export default function handler(
   req: NextApiRequest,
@@ -16,17 +16,19 @@ export default function handler(
         secretAccessKey: body.secretAccessKey,
       },
     });
-    
-    const getBuckets = async () => {
+
+    const getFiles = async () => {
       try {
-        const response = await s3Client.send(new ListBucketsCommand({}));
+        const response = await s3Client.send(new ListObjectsV2Command({
+          Bucket: body.bucketName,
+        }));
         res.status(200).json(response);
       } catch (error: any) {
         res.status(500).json({message: error?.message});
       }
     };
-    
-    getBuckets();
+
+    getFiles();
   }
   else {
     res.status(404).json({message: 'API not found!'});

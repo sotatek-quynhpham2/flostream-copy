@@ -10,7 +10,7 @@ export const Header = () => {
       className="flex flex-row justify-between items-center h-[60px] px-6 py-[10px] bg-[#292929]"
     >
       <Link href="/">
-        <Image src={FlostreamLogo} height={18} alt="FlostreamLogo" />
+        <Image src={FlostreamLogo} height={18} alt="FlostreamLogo" priority />
       </Link>
     </div>
   );
