@@ -9,11 +9,11 @@ export const Main = () => {
   const [buckets, setBuckets] = useState<any>([]);
 
   const [accessKeyId, setAccessKeyId] = useState<string>(
-    'SKEZ6znfei9avPnqorCQ3nqLws'
+    'AKIAQFPO2RESJQOEOV7L'
   );
 
   const [secretAccessKey, setSecretAccessKey] = useState<string>(
-    'bb9fd7ee7925a0420a1b54105998ab0d69fb3b567aecb8d98338b8c4ff1ef762'
+    'PTyW4KO6djtUVACvlK+vTo7qeFYsDCCXhW/rP8ub'
   );
 
   const getBuckets = () => {

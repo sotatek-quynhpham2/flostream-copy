@@ -5,7 +5,7 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
   const body = JSON.parse(req.body);
 
   const s3Client = new S3Client({
-    endpoint: process.env.NEXT_PUBLIC_FLOSTREAM_ENDPOINT,
+    // endpoint: process.env.NEXT_PUBLIC_FLOSTREAM_ENDPOINT,
     region: process.env.NEXT_PUBLIC_FLOSTREAM_REGION,
     credentials: {
       accessKeyId: body.accessKeyId,

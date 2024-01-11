@@ -10,6 +10,8 @@ import SearchOutlineIcon from '@/assets/icons/search-outline.svg';
 import ReloadIcon from '@/assets/icons/reload.svg';
 import UploadIcon from '@/assets/icons/upload.svg';
 
+import { ListFile } from '@/components/ListFiles';
+
 const Bucket: NextPage = () => {
   const router = useRouter();
   const { bucket } = router.query;
@@ -68,8 +70,8 @@ const Bucket: NextPage = () => {
     })
       .then((res) => res.json())
       .then((data) => {
-        console.log('data', data);
         setNewFile(undefined);
+        fetchFiles();
       });
   };
 
@@ -144,6 +146,9 @@ const Bucket: NextPage = () => {
               <span className="font-medium text-white text-[16px]">Upload</span>
             </button>
           </div>
+        </div>
+        <div className="mt-6">
+          <ListFile files={files} />
         </div>
       </div>
     </Layout>
