@@ -9,6 +9,7 @@ import ArrowBanckIcon from '@/assets/icons/arrow-back.svg';
 import SearchOutlineIcon from '@/assets/icons/search-outline.svg';
 import ReloadIcon from '@/assets/icons/reload.svg';
 import UploadIcon from '@/assets/icons/upload.svg';
+import ClearIcon from '@/assets/icons/clear.svg';
 
 import { ListFile } from '@/components/ListFiles';
 
@@ -20,11 +21,25 @@ const Bucket: NextPage = () => {
 
   const [keySearch, setKeySearch] = useState<string>('');
   const [files, setFiles] = useState<any>([]);
+  const [filesByFilter, setFilesByFilter] = useState<any>([]);
 
   const [newFile, setNewFile] = useState<any>(undefined);
 
   const searchFiles = () => {
-    console.log('searchFiles', keySearch);
+    if (!keySearch) {
+      setFilesByFilter(files);
+      return;
+    } else {
+      let newFiles = files.filter((file: any) => {
+        return file.Key.includes(keySearch.toLowerCase());
+      });
+      setFilesByFilter(newFiles);
+    }
+  };
+
+  const refresh = () => {
+    fetchFiles();
+    setKeySearch('');
   };
 
   const fetchFiles = async () => {
@@ -45,6 +60,7 @@ const Bucket: NextPage = () => {
         .then((res) => res.json())
         .then((data) => {
           setFiles(data?.Contents);
+          setFilesByFilter(data?.Contents);
         });
     } else {
       router.push('/');
@@ -104,25 +120,31 @@ const Bucket: NextPage = () => {
           {bucket}
         </h2>
         <div className="mt-6 flex flex-row items-center justify-between">
-          <div className="flex flex-row items-center gap-2">
+          <div className="flex flex-row items-center gap-2 relative">
             <input
               type="text"
               placeholder="Search files"
-              className="border border-[#D7DCE0] rounded-lg w-[300px] h-[36px] px-3 py-2 focus-visible:outline-none font-normal text-[#292929] text-[16px] leading-normal p
+              className="border border-[#D7DCE0] rounded w-[300px] h-[36px] px-10 py-2 focus-visible:outline-none font-normal text-[#292929] text-[16px] leading-normal p
             placeholder-[#999]"
               value={keySearch}
+              onKeyUp={() => searchFiles()}
               onChange={(e) => setKeySearch(e.target.value)}
             />
-            <button
-              className="border border-[#D7DCE0] rounded-lg h-[36px] px-2 py-2"
-              onClick={() => searchFiles()}
-            >
+            <Image
+              src={SearchOutlineIcon}
+              height={20}
+              alt="SearchOutlineIcon"
+              className="absolute left-3 top-1/2 transform -translate-y-1/2"
+            />
+            {keySearch && (
               <Image
-                src={SearchOutlineIcon}
+                src={ClearIcon}
                 height={20}
                 alt="SearchOutlineIcon"
+                className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
+                onClick={() => setKeySearch('')}
               />
-            </button>
+            )}
           </div>
           <div className="flex flex-row items-center gap-2">
             <input
@@ -134,7 +156,7 @@ const Bucket: NextPage = () => {
             />
             <button
               className="border border-[#1F3832] rounded-lg h-[36px] px-[10px] py-[10px]"
-              onClick={() => fetchFiles()}
+              onClick={() => refresh()}
             >
               <Image src={ReloadIcon} height={16} alt="ReloadIcon" />
             </button>
@@ -148,7 +170,7 @@ const Bucket: NextPage = () => {
           </div>
         </div>
         <div className="mt-6">
-          <ListFile files={files} />
+          <ListFile bucket={bucket} files={filesByFilter} />
         </div>
       </div>
     </Layout>
