@@ -4,7 +4,7 @@ import { Suspense } from 'react'
 export const Table = ({ dataTable }: TableDataProps) => {
     console.log(dataTable);
     return (
-        <div className="table w-full">
+        <div className="table w-full h-fit">
             <div className="table-header-group bg-textInput text-white">
                 <div className="table-row">
                     <div className="table-cell text-left px-4 py-2 font-medium w-[35%] ">Name</div>
