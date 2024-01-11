@@ -1,34 +1,26 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { ListBucketsCommand, S3Client } from '@aws-sdk/client-s3';
 
-export default function handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-) {
-  if (req.method === 'POST') {
-    const body = JSON.parse(req.body);
+async function POST(req: NextApiRequest, res: NextApiResponse) {
+  const body = JSON.parse(req.body);
 
-    const s3Client = new S3Client({
-      endpoint: process.env.NEXT_PUBLIC_FLOSTREAM_ENDPOINT,
-      region: process.env.NEXT_PUBLIC_FLOSTREAM_REGION,
-      credentials: {
-        accessKeyId: body.accessKeyId,
-        secretAccessKey: body.secretAccessKey,
-      },
+  const s3Client = new S3Client({
+    endpoint: process.env.NEXT_PUBLIC_FLOSTREAM_ENDPOINT,
+    region: process.env.NEXT_PUBLIC_FLOSTREAM_REGION,
+    credentials: {
+      accessKeyId: body.accessKeyId,
+      secretAccessKey: body.secretAccessKey,
+    },
+  });
+
+  await s3Client
+    .send(new ListBucketsCommand({}))
+    .then((response) => {
+      res.status(200).json(response);
+    })
+    .catch((error) => {
+      res.status(500).json({ message: error?.message });
     });
-    
-    const getBuckets = async () => {
-      try {
-        const response = await s3Client.send(new ListBucketsCommand({}));
-        res.status(200).json(response);
-      } catch (error: any) {
-        res.status(500).json({message: error?.message});
-      }
-    };
-    
-    getBuckets();
-  }
-  else {
-    res.status(404).json({message: 'API not found!'});
-  }
 }
+
+export default POST;

@@ -76,7 +76,7 @@ export const Main = () => {
             <tbody>
               {buckets.map((bucket: any) => (
                 <tr key={bucket?.Name}>
-                  <td className="border px-4 py-2"><Link href={`/bucket/${bucket?.Name}`} >{bucket?.Name}</Link></td>
+                  <td className="border px-4 py-2"><Link href={`/buckets/${bucket?.Name}`} >{bucket?.Name}</Link></td>
                   <td className="border px-4 py-2">
                     { process.env.NEXT_PUBLIC_FLOSTREAM_REGION }
                   </td>
