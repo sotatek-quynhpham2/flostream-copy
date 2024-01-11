@@ -37,6 +37,11 @@ const Bucket: NextPage = () => {
     }
   };
 
+  const clearSearch = () => {
+    setKeySearch('');
+    setFilesByFilter(files);
+  }
+
   const refresh = () => {
     fetchFiles();
     setKeySearch('');
@@ -142,7 +147,7 @@ const Bucket: NextPage = () => {
                 height={20}
                 alt="SearchOutlineIcon"
                 className="absolute right-3 top-1/2 transform -translate-y-1/2 cursor-pointer"
-                onClick={() => setKeySearch('')}
+                onClick={() => clearSearch()}
               />
             )}
           </div>

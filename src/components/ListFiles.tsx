@@ -6,7 +6,7 @@ import moment from 'moment';
 import FileIcon from '@/assets/icons/file.svg';
 import CopyIcon from '@/assets/icons/copy.svg';
 import DownloadIcon from '@/assets/icons/download.svg';
-import { blob } from 'stream/consumers';
+
 export const ListFile = ({ bucket, files }: any) => {
   const getFileType = (fileName: string) => {
     return fileName.split('.').pop()?.toLowerCase();
