@@ -1,37 +1,50 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
 import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import formidable from 'formidable-serverless';
+import * as fs from 'fs';
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method === 'POST') {
-    
-    const body = req.body;
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+};
+
+async function POST(req: NextApiRequest, res: NextApiResponse) {
+  const form = new formidable.IncomingForm();
+
+  form.parse(req, async (error: any, fields: any, files: any) => {
+    if (error) {
+      throw error;
+    }
+
     const s3Client = new S3Client({
       // endpoint: process.env.NEXT_PUBLIC_FLOSTREAM_ENDPOINT,
       region: process.env.NEXT_PUBLIC_FLOSTREAM_REGION,
       credentials: {
-        accessKeyId: body.accessKeyId,
-        secretAccessKey: body.secretAccessKey,
+        accessKeyId: fields.accessKeyId,
+        secretAccessKey: fields.secretAccessKey,
       },
     });
 
-    const uploadFile = async () => {
-      try {
-        const response = await s3Client.send(
-          new PutObjectCommand({
-            Bucket: body.bucketName,
-            Key: body.file,
-            Body: body.file,
-            ContentType: body.file.type,
-          })
-        );
-        res.status(200).json(response);
-      } catch (error: any) {
-        res.status(500).json({ message: error?.message });
-      }
-    };
+    let path = files.file.path;
+    let rawData = fs.readFileSync(path);
 
-    uploadFile();
-  } else {
-    res.status(404).json({ message: 'API not found!' });
-  }
+    await s3Client
+      .send(
+        new PutObjectCommand({
+          Bucket: fields.bucketName,
+          Key: files.file.name,
+          Body: rawData,
+          ContentType: files.file.type,
+        })
+      )
+      .then((response) => {
+        res.status(200).json(response);
+      })
+      .catch((error) => {
+        res.status(500).json({ message: error?.message });
+      });
+  });
 }
+
+export default POST;
