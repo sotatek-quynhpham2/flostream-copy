@@ -1,25 +1,28 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DefaultLayout as Layout } from "@/layouts/default";
 import { Main } from "@/components/Main";
 import { Modal } from "@/components/Modal";
 import { Button } from "@/components/Button";
+import { Suspense } from 'react'
+
 
 const Home: NextPage = () => {
   const [showModal, setShowModal] = useState(true)
   const [buckets, setBuckets] = useState<any>([]);
 
   const [accessKeyId, setAccessKeyId] = useState<string>(
-    'SKEZ6znfei9avPnqorCQ3nqLws'
+    'AKIAQFPO2RESJQOEOV7L'
   );
 
   const [secretAccessKey, setSecretAccessKey] = useState<string>(
-    'bb9fd7ee7925a0420a1b54105998ab0d69fb3b567aecb8d98338b8c4ff1ef762'
+    'PTyW4KO6djtUVACvlK+vTo7qeFYsDCCXhW/rP8ub'
   );
 
   const getBuckets = () => {
-
+    sessionStorage.setItem('accessKeyId', accessKeyId);
+    sessionStorage.setItem('secretAccessKey', secretAccessKey);
     fetch('/api/list-buckets', {
       method: 'POST',
       body: JSON.stringify({
@@ -33,6 +36,15 @@ const Home: NextPage = () => {
         setShowModal(false)
       });
   };
+
+  useEffect(() => {
+    let accessKeyId = sessionStorage.getItem('accessKeyId');
+    let secretAccessKey = sessionStorage.getItem('secretAccessKey');
+    if (secretAccessKey && accessKeyId) {
+      setShowModal(false)
+      getBuckets()
+    }
+  }, []);
 
   return (
     <Layout>

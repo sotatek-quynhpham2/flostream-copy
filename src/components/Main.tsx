@@ -17,29 +17,31 @@ export const Main = ({ dataBuckets }: any) => {
     'PTyW4KO6djtUVACvlK+vTo7qeFYsDCCXhW/rP8ub'
   );
 
-  const getBuckets = () => {
-    sessionStorage.setItem('accessKeyId', accessKeyId);
-    sessionStorage.setItem('secretAccessKey', secretAccessKey);
+  // const getBuckets = () => {
+  //   sessionStorage.setItem('accessKeyId', accessKeyId);
+  //   sessionStorage.setItem('secretAccessKey', secretAccessKey);
 
-    fetch('/api/list-buckets', {
-      method: 'POST',
-      body: JSON.stringify({
-        accessKeyId,
-        secretAccessKey,
-      }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        setBuckets(data.Buckets);
-      });
-  };
+  //   fetch('/api/list-buckets', {
+  //     method: 'POST',
+  //     body: JSON.stringify({
+  //       accessKeyId,
+  //       secretAccessKey,
+  //     }),
+  //   })
+  //     .then((res) => res.json())
+  //     .then((data) => {
+  //       setBuckets(data.Buckets);
+  //     });
+  // };
 
-  useEffect(() => { }, []);
+  useEffect(() => {
+
+  }, []);
 
   return (
     <div id="main" className="use-tailwind">
       <div className="container mx-auto">
-        <div className="flex align-middle justify-center mt-5">
+        <div className="flex align-middle justify-center mt-5 min-h-[400px] border border-colorBorder">
           {dataBuckets && (
             <Table dataTable={dataBuckets} />
           )}
