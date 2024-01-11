@@ -4,9 +4,6 @@ import React, { useState, useEffect } from "react";
 import { DefaultLayout as Layout } from "@/layouts/default";
 import { Main } from "@/components/Main";
 import { Modal } from "@/components/Modal";
-import { Button } from "@/components/Button";
-import { Suspense } from 'react'
-
 
 const Home: NextPage = () => {
   const [showModal, setShowModal] = useState(true)
@@ -20,9 +17,13 @@ const Home: NextPage = () => {
     'PTyW4KO6djtUVACvlK+vTo7qeFYsDCCXhW/rP8ub'
   );
 
-  const getBuckets = () => {
+  const syncAuth = () => {
     sessionStorage.setItem('accessKeyId', accessKeyId);
     sessionStorage.setItem('secretAccessKey', secretAccessKey);
+    getBuckets()
+  }
+
+  const getBuckets = () => {
     fetch('/api/list-buckets', {
       method: 'POST',
       body: JSON.stringify({
@@ -56,7 +57,7 @@ const Home: NextPage = () => {
         <meta name="description" content="FloStream Storage" />
       </Head>
       {
-        showModal && (<Modal ariaLabel='Authentication' ariaLabelFooter='Next' handleNext={() => getBuckets()} showClose={false}>
+        showModal && (<Modal ariaLabel='Authentication' ariaLabelFooter='Next' handleNext={() => syncAuth()} showClose={false}>
           <p className="text-center text-baseText mb-6">Provide authentication to access the project.</p>
           <div className="text-center text-baseText">
             <div className="text-left pr-2 mb-2">
