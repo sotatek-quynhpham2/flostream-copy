@@ -9,13 +9,15 @@ import ArrowBanckIcon from '@/assets/icons/arrow-back.svg';
 import SearchOutlineIcon from '@/assets/icons/search-outline.svg';
 import ReloadIcon from '@/assets/icons/reload.svg';
 import UploadIcon from '@/assets/icons/upload.svg';
-import axios from 'axios';
+
+import { ListFile } from '@/components/ListFiles';
 
 const Bucket: NextPage = () => {
   const router = useRouter();
-  const { slug } = router.query;
-  const [accessKeyId, setAccessKeyId] = useState<string>('');
+  const { bucket } = router.query;
+  const [accessKeyId, setAccessKeyId] = useState<string>();
   const [secretAccessKey, setSecretAccessKey] = useState<string>('');
+
   const [keySearch, setKeySearch] = useState<string>('');
   const [files, setFiles] = useState<any>([]);
 
@@ -25,24 +27,24 @@ const Bucket: NextPage = () => {
     console.log('searchFiles', keySearch);
   };
 
-  const fetchFiles = () => {
-    const accessKeyId = sessionStorage.getItem('accessKeyId');
-    const secretAccessKey = sessionStorage.getItem('secretAccessKey');
+  const fetchFiles = async () => {
+    let accessKeyId = sessionStorage.getItem('accessKeyId');
+    let secretAccessKey = sessionStorage.getItem('secretAccessKey');
     if (accessKeyId && secretAccessKey) {
       setAccessKeyId(accessKeyId);
       setSecretAccessKey(secretAccessKey);
-      fetch('/api/list-files', {
+
+      await fetch('/api/list-files', {
         method: 'POST',
         body: JSON.stringify({
           accessKeyId,
           secretAccessKey,
-          bucketName: slug,
+          bucketName: bucket,
         }),
       })
         .then((res) => res.json())
         .then((data) => {
-          console.log('data', data);
-          setFiles([]);
+          setFiles(data?.Contents);
         });
     } else {
       router.push('/');
@@ -50,36 +52,32 @@ const Bucket: NextPage = () => {
   };
 
   useEffect(() => {
-    fetchFiles();
-  }, [slug]);
+    if (bucket) {
+      fetchFiles();
+    }
+  }, [bucket]);
+
+  const uploadFile = async () => {
+    const formData = new FormData();
+    formData.append('file', newFile);
+    formData.append('accessKeyId', accessKeyId as string);
+    formData.append('secretAccessKey', secretAccessKey as string);
+    formData.append('bucketName', bucket as string);
+
+    await fetch('/api/upload-file', {
+      method: 'POST',
+      body: formData,
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        setNewFile(undefined);
+        fetchFiles();
+      });
+  };
 
   useEffect(() => {
     if (newFile) {
-      const accessKeyId = sessionStorage.getItem('accessKeyId');
-      const secretAccessKey = sessionStorage.getItem('secretAccessKey');
-
-      if (accessKeyId && secretAccessKey) {
-        setAccessKeyId(accessKeyId);
-        setSecretAccessKey(secretAccessKey);
-
-        const formData = new FormData();
-        formData.append('file', newFile);
-        formData.append('accessKeyId', accessKeyId as string);
-        formData.append('secretAccessKey', secretAccessKey as string);
-        formData.append('bucketName', slug as string);
-
-        fetch('/api/upload-file', {
-          method: 'POST',
-          body: formData
-        })
-          .then((res) => res.json())
-          .then((data) => {
-            console.log('data', data);
-            setNewFile(undefined);
-          });
-      } else {
-        return;
-      }
+      uploadFile();
     }
   }, [newFile]);
 
@@ -103,20 +101,20 @@ const Bucket: NextPage = () => {
           </span>
         </button>
         <h2 className="mt-6 text-[#292929] font-bold text-[28px] leading-normal">
-          {slug}
+          {bucket}
         </h2>
         <div className="mt-6 flex flex-row items-center justify-between">
           <div className="flex flex-row items-center gap-2">
             <input
               type="text"
               placeholder="Search files"
-              className="border border-[#D7DCE0] rounded w-[300px] h-[36px] px-3 py-2 focus-visible:outline-none font-normal text-[#292929] text-[16px] leading-normal p
+              className="border border-[#D7DCE0] rounded-lg w-[300px] h-[36px] px-3 py-2 focus-visible:outline-none font-normal text-[#292929] text-[16px] leading-normal p
             placeholder-[#999]"
               value={keySearch}
               onChange={(e) => setKeySearch(e.target.value)}
             />
             <button
-              className="border border-[#D7DCE0] rounded h-[36px] px-2 py-2"
+              className="border border-[#D7DCE0] rounded-lg h-[36px] px-2 py-2"
               onClick={() => searchFiles()}
             >
               <Image
@@ -148,6 +146,9 @@ const Bucket: NextPage = () => {
               <span className="font-medium text-white text-[16px]">Upload</span>
             </button>
           </div>
+        </div>
+        <div className="mt-6">
+          <ListFile files={files} />
         </div>
       </div>
     </Layout>
