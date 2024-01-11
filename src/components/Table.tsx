@@ -1,10 +1,11 @@
 import moment from 'moment';
 import Link from 'next/link';
 import { Suspense } from 'react';
+
 export const Table = ({ dataTable }: TableDataProps) => {
   return (
     <div className="table w-full h-fit">
-      <div className="table-header-group bg-textInput text-white">
+      <div className="table-header-group bg-[#1F3832] text-white">
         <div className="table-row">
           <div className="table-cell text-left px-4 py-2 font-medium w-[35%] ">
             Name
@@ -24,7 +25,7 @@ export const Table = ({ dataTable }: TableDataProps) => {
               key={bucket?.Name}
               className="table-row border even:bg-[#F2F2F2] odd:bg-white"
             >
-              <div className=" table-cell px-4 py-2 text-textBlue font-normal">
+              <div className=" table-cell px-4 py-2 text-[#0066CC] font-normal">
                 <Link href={`/buckets/${bucket?.Name}`}>{bucket?.Name}</Link>
               </div>
               <div className=" table-cell px-4 py-2 font-normal">

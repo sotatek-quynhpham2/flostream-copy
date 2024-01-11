@@ -122,7 +122,7 @@ const Bucket: NextPage = () => {
           </span>
         </button>
         <h2 className="mt-6 text-[#292929] font-bold text-[28px] leading-normal">
-          {bucket}
+          {`Buckets / ${bucket}`}
         </h2>
         <div className="mt-6 flex flex-row items-center justify-between">
           <div className="flex flex-row items-center gap-2 relative">
