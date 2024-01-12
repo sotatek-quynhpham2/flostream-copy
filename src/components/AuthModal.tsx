@@ -92,7 +92,7 @@ export const AuthModal = ({
               Secret Key
             </label>
             <input
-              type="text"
+              type="password"
               value={secretAccessKey}
               className={`w-full md:w-[240px] h-8 border border-[#BFBFBF] rounded text-[#1F3832] px-2 py-1 overflow-ellipsis focus-visible:outline-none ${
                 secretAccessKeyError
