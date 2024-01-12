@@ -33,7 +33,7 @@ export const TableFiles = ({ bucket, files }: any) => {
       if (res.ok) {
         res.json().then((data) => {
           navigator.clipboard.writeText(data);
-          toast.success('Copy presigned url successfully');
+          toast.success('Copied! The presigned url will expire in 24h.');
         });
       } else {
         res.json().then((data) => {
