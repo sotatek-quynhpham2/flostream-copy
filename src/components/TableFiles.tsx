@@ -1,13 +1,13 @@
-import Link from 'next/link';
 import React from 'react';
 import Image from 'next/image';
 import moment from 'moment';
+import { toast } from 'react-toastify';
 
 import FileIcon from '@/assets/icons/file.svg';
 import CopyIcon from '@/assets/icons/copy.svg';
 import DownloadIcon from '@/assets/icons/download.svg';
 
-export const ListFile = ({ bucket, files }: any) => {
+export const TableFiles = ({ bucket, files }: any) => {
   const getFileType = (fileName: string) => {
     return fileName.split('.').pop()?.toLowerCase();
   };
@@ -29,11 +29,18 @@ export const ListFile = ({ bucket, files }: any) => {
         bucketName: bucket,
         objectKey: key,
       }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        navigator.clipboard.writeText(data?.url);
-      });
+    }).then((res) => {
+      if (res.ok) {
+        res.json().then((data) => {
+          navigator.clipboard.writeText(data);
+          toast.success('Copy presigned url successfully');
+        });
+      } else {
+        res.json().then((data) => {
+          toast.error(data.message);
+        });
+      }
+    });
   };
 
   const handleDownload = async (key: string) => {
@@ -45,26 +52,32 @@ export const ListFile = ({ bucket, files }: any) => {
         bucketName: bucket,
         objectKey: key,
       }),
-    })
-      .then((res) => res.json())
-      .then(async (data) => {
-        const blob = await fetch(data?.url).then((r) => r.blob());
-        const link = document.createElement('a');
-        link.href = window.URL.createObjectURL(blob);
-        link.download = key;
-        link.click();
-      });
+    }).then((res) => {
+      if (res.ok) {
+        res.json().then(async (data) => {
+          const blob = await fetch(data?.url).then((r) => r.blob());
+          const link = document.createElement('a');
+          link.href = window.URL.createObjectURL(blob);
+          link.download = key;
+          link.click();
+        });
+      } else {
+        res.json().then((data) => {
+          toast.error(data.message);
+        });
+      }
+    });
   };
 
   return (
     <table className="w-full border border-[#BFBFBF]">
       <thead className="bg-[#1F3832] text-white text-[16px] font-medium leading-normal">
         <tr>
-          <td className="px-4 py-2 text-left">Name</td>
-          <td className="px-4 py-2 text-left">Type</td>
-          <td className="px-4 py-2 text-right">Last modified</td>
-          <td className="px-4 py-2 text-center">Size</td>
-          <td className="px-4 py-2 text-center">Action</td>
+          <td className="px-4 py-2 text-left min-w-[300px]">Name</td>
+          <td className="px-4 py-2 text-left min-w-24">Type</td>
+          <td className="px-4 py-2 text-right min-w-[200px]">Last modified</td>
+          <td className="px-4 py-2 text-center min-w-[150px]">Size</td>
+          <td className="px-4 py-2 text-center min-w-24">Action</td>
         </tr>
       </thead>
       <tbody role="list">
@@ -108,11 +121,7 @@ export const ListFile = ({ bucket, files }: any) => {
         ) : (
           <tr className="bg-white text-[#292929] text-[16px] font-normal leading-normal min-h-24">
             <td className="px-4 py-2 text-center h-[400px]" colSpan={5}>
-              No record found.
-              <svg
-                className="animate-spin h-5 w-5 mr-3"
-                viewBox="0 0 24 24"
-              ></svg>
+              No file found.
             </td>
           </tr>
         )}

@@ -1,7 +1,7 @@
 import { NextPage } from 'next';
 import { useRouter } from 'next/router';
-import Head from 'next/head';
 import React, { useEffect, useState } from 'react';
+import { toast } from 'react-toastify';
 import { DefaultLayout as Layout } from '@/layouts/default';
 
 import Image from 'next/image';
@@ -11,7 +11,7 @@ import ReloadIcon from '@/assets/icons/reload.svg';
 import UploadIcon from '@/assets/icons/upload.svg';
 import ClearIcon from '@/assets/icons/clear.svg';
 
-import { ListFile } from '@/components/ListFiles';
+import { TableFiles } from '@/components/TableFiles';
 
 const Bucket: NextPage = () => {
   const router = useRouter();
@@ -40,7 +40,7 @@ const Bucket: NextPage = () => {
   const clearSearch = () => {
     setKeySearch('');
     setFilesByFilter(files);
-  }
+  };
 
   const refresh = () => {
     fetchFiles();
@@ -61,12 +61,18 @@ const Bucket: NextPage = () => {
           secretAccessKey,
           bucketName: bucket,
         }),
-      })
-        .then((res) => res.json())
-        .then((data) => {
-          setFiles(data?.Contents);
-          setFilesByFilter(data?.Contents);
-        });
+      }).then((res) => {
+        if (res.ok) {
+          res.json().then(async (data) => {
+            setFiles(data?.Contents);
+            setFilesByFilter(data?.Contents);
+          });
+        } else {
+          res.json().then((data) => {
+            toast.error(data.message);
+          });
+        }
+      });
     } else {
       router.push('/');
     }
@@ -88,12 +94,17 @@ const Bucket: NextPage = () => {
     await fetch('/api/upload-file', {
       method: 'POST',
       body: formData,
-    })
-      .then((res) => res.json())
-      .then((data) => {
+    }).then((res) => {
+      if (res.ok) {
+        toast.success('Upload file successfully');
         setNewFile(undefined);
         fetchFiles();
-      });
+      } else {
+        res.json().then((data) => {
+          toast.error(data.message);
+        });
+      }
+    });
   };
 
   useEffect(() => {
@@ -104,14 +115,7 @@ const Bucket: NextPage = () => {
 
   return (
     <Layout>
-      <Head>
-        <title>Flostream Storage</title>
-        <meta name="theme-color" content="#ffffff" />
-        <meta name="viewport" content="width=device-width" />
-        <link rel="icon" type="image/x-icon" href="/favicon.ico" />
-        <meta name="description" content="Flostream Storage" />
-      </Head>
-      <div className="grid grid-col-12 px-12 py-8">
+      <div className="grid grid-col-12 p-5 md:px-12 md:py-8">
         <button
           onClick={() => router.back()}
           className="flex flex-row items-center gap-1"
@@ -124,12 +128,12 @@ const Bucket: NextPage = () => {
         <h2 className="mt-6 text-[#292929] font-bold text-[28px] leading-normal">
           {`Buckets / ${bucket}`}
         </h2>
-        <div className="mt-6 flex flex-row items-center justify-between">
+        <div className="mt-6 flex flex-col gap-2 justify-between md:flex-row md:items-center">
           <div className="flex flex-row items-center gap-2 relative">
             <input
               type="text"
               placeholder="Search files"
-              className="border border-[#D7DCE0] rounded w-[300px] h-[36px] px-10 py-2 focus-visible:outline-none font-normal text-[#292929] text-[16px] leading-normal p
+              className="border border-[#D7DCE0] rounded-lg w-full md:w-[300px] h-9 px-10 py-2 focus-visible:outline-none font-normal text-[#292929] text-[16px] leading-normal p
             placeholder-[#999]"
               value={keySearch}
               onKeyUp={() => searchFiles()}
@@ -160,13 +164,13 @@ const Bucket: NextPage = () => {
               id="file-upload"
             />
             <button
-              className="border border-[#1F3832] rounded-lg h-[36px] px-[10px] py-[10px]"
+              className="border border-[#1F3832] rounded-lg h-9 w-9 px-[10px] py-[10px]"
               onClick={() => refresh()}
             >
               <Image src={ReloadIcon} height={16} alt="ReloadIcon" />
             </button>
             <button
-              className="flex flex-row items-center gap-2 border bg-[#1F3832] border-[#1F3832] rounded-lg h-[36px] px-3 py-2"
+              className="flex flex-row justify-center items-center gap-2 border bg-[#1F3832] border-[#1F3832] rounded-lg h-9 w-[100px] px-3 py-2"
               onClick={() => document.getElementById('file-upload')?.click()}
             >
               <Image src={UploadIcon} height={18} alt="UploadIcon" />
@@ -174,8 +178,8 @@ const Bucket: NextPage = () => {
             </button>
           </div>
         </div>
-        <div className="mt-6">
-          <ListFile bucket={bucket} files={filesByFilter} />
+        <div className="mt-6 w-full overflow-auto">
+          <TableFiles bucket={bucket} files={filesByFilter} />
         </div>
       </div>
     </Layout>

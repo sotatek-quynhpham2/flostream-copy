@@ -18,8 +18,8 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
     }
 
     const s3Client = new S3Client({
-      // endpoint: process.env.NEXT_PUBLIC_FLOSTREAM_ENDPOINT,
-      region: process.env.NEXT_PUBLIC_FLOSTREAM_REGION,
+      endpoint: process.env.NEXT_PUBLIC_STORE_ENDPOINT,
+      region: process.env.NEXT_PUBLIC_STORE_REGION,
       credentials: {
         accessKeyId: fields.accessKeyId,
         secretAccessKey: fields.secretAccessKey,
@@ -42,7 +42,7 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
         res.status(200).json(response);
       })
       .catch((error) => {
-        res.status(500).json({ message: error?.message });
+        res.status(500).json(error);
       });
   });
 }
