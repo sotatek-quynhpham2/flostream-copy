@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import WarningIcoon from '@/assets/icons/warning.svg';
+import WarningIcon from '@/assets/icons/warning.svg';
 import { toast } from 'react-toastify';
 
 export const AuthModal = ({
@@ -81,7 +81,7 @@ export const AuthModal = ({
           </div>
           {accessKeyIdError && (
             <div className="mt-2 flex items-center gap-2 justify-end">
-              <Image src={WarningIcoon} height={16} alt="WarningIcoon" />
+              <Image src={WarningIcon} height={16} alt="WarningIcon" />
               <span className="text-[#D72B28] text-[13px] font-normal leading-normal">
                 {accessKeyIdError}
               </span>
@@ -104,7 +104,7 @@ export const AuthModal = ({
           </div>
           {secretAccessKeyError && (
             <div className="mt-2 flex items-center gap-2 justify-end">
-              <Image src={WarningIcoon} height={16} alt="WarningIcoon" />
+              <Image src={WarningIcon} height={16} alt="WarningIcon" />
               <span className="text-[#D72B28] text-[13px] font-normal leading-normal">
                 {secretAccessKeyError}
               </span>

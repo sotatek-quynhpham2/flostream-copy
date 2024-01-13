@@ -5,7 +5,7 @@ import { toast } from 'react-toastify';
 import { DefaultLayout as Layout } from '@/layouts/default';
 
 import Image from 'next/image';
-import ArrowBanckIcon from '@/assets/icons/arrow-back.svg';
+import ArrowBackIcon from '@/assets/icons/arrow-back.svg';
 import SearchOutlineIcon from '@/assets/icons/search-outline.svg';
 import ReloadIcon from '@/assets/icons/reload.svg';
 import UploadIcon from '@/assets/icons/upload.svg';
@@ -120,7 +120,7 @@ const Bucket: NextPage = () => {
           onClick={() => router.back()}
           className="flex flex-row items-center gap-1"
         >
-          <Image src={ArrowBanckIcon} height={14} alt="ArrowBanckIcon" />
+          <Image src={ArrowBackIcon} height={14} alt="ArrowBackIcon" />
           <span className="text-[#1F3832] font-medium text-[13px] leading-normal">
             Back
           </span>

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import CloseIcon from '@/assets/icons/close.svg';
-import WarningIcoon from '@/assets/icons/warning.svg';
+import WarningIcon from '@/assets/icons/warning.svg';
 import { toast } from 'react-toastify';
 
 export const CreateBucketModal = ({
@@ -12,9 +12,25 @@ export const CreateBucketModal = ({
   const [bucketName, setBucketName] = useState<string>('');
   const [bucketError, setBucketError] = useState<string>('');
 
-  const bucketNameRegex = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+  const bucketNameRegex = /(?!(^xn--|.+-s3alias$))^[a-z0-9][a-z0-9-]{1,61}[a-z0-9]$/;
+
+  const validateBucketName = (bucketName: string) => {
+    return bucketNameRegex.test(bucketName);
+  };
 
   const createBucket = async () => {
+    if (buckets?.length > 0) {
+      let isExist = buckets?.find((bucket: any) => bucket.Name === bucketName);
+      if (isExist) {
+        setBucketError('Existed bucket name.');
+        return;
+      }
+      if (!validateBucketName(bucketName)) {
+        setBucketError('The specified bucket is not valid.');
+        return;
+      }
+    }
+
     await fetch('/api/create-bucket', {
       method: 'POST',
       body: JSON.stringify({
@@ -36,22 +52,7 @@ export const CreateBucketModal = ({
   };
 
   useEffect(() => {
-    if (
-      (bucketName && !bucketNameRegex.test(bucketName)) ||
-      bucketName?.length > 63
-    ) {
-      setBucketError('Bucket name is invalid.');
-      return;
-    }
-
-    if (buckets?.length > 0) {
-      let isExist = buckets?.find((bucket: any) => bucket.Name === bucketName);
-      if (isExist) {
-        setBucketError('Existed bucket name.');
-      } else {
-        setBucketError('');
-      }
-    }
+    setBucketError('');
   }, [bucketName]);
 
   return (
@@ -93,7 +94,7 @@ export const CreateBucketModal = ({
         </div>
         {bucketError && (
           <div className="mt-2 flex items-center gap-2 justify-end">
-            <Image src={WarningIcoon} height={16} alt="WarningIcoon" />
+            <Image src={WarningIcon} height={16} alt="WarningIcon" />
             <span className="text-[#D72B28] text-[13px] font-normal leading-normal">
               {bucketError}
             </span>
