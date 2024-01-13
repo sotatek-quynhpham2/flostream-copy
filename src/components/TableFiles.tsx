@@ -55,7 +55,7 @@ export const TableFiles = ({ bucket, files }: any) => {
     }).then((res) => {
       if (res.ok) {
         res.json().then(async (data) => {
-          const blob = await fetch(data?.url).then((r) => r.blob());
+          const blob = await fetch(data).then((r) => r.blob());
           const link = document.createElement('a');
           link.href = window.URL.createObjectURL(blob);
           link.download = key;
