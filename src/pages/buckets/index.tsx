@@ -1,5 +1,6 @@
 import type { NextPage } from 'next';
 import React, { useState, useEffect } from 'react';
+import { toast } from 'react-toastify';
 import { DefaultLayout as Layout } from '@/layouts/default';
 import { AuthModal } from '@/components/AuthModal';
 import { CreateBucketModal } from '@/components/CreateBucketModal';
@@ -10,7 +11,7 @@ import SearchOutlineIcon from '@/assets/icons/search-outline.svg';
 import ReloadIcon from '@/assets/icons/reload.svg';
 import ClearIcon from '@/assets/icons/clear.svg';
 
-const BucketsPage: NextPage = ({ toast }: any) => {
+const BucketsPage: NextPage = () => {
   const [showModalAuth, setShowModalAuth] = useState(true);
   const [showModalCreateBucket, setShowModalCreateBucket] = useState(false);
 
