@@ -21,12 +21,10 @@ const BucketsPage: NextPage = () => {
 
   const [accessKeyId, setAccessKeyId] = useState<string>(
     'AKIAQFPO2RESJQOEOV7L' // aws
-    // 'SKEZ6znfei9avPnqorCQ3nqLws' // flostream
   );
 
   const [secretAccessKey, setSecretAccessKey] = useState<string>(
     'PTyW4KO6djtUVACvlK+vTo7qeFYsDCCXhW/rP8ub' // aws
-    // 'bb9fd7ee7925a0420a1b54105998ab0d69fb3b567aecb8d98338b8c4ff1ef762' // flostream
   );
 
   const getBuckets = () => {
