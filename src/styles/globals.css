@@ -1,6 +1,7 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+@import url('./font.css');
 
 :root {
   --foreground-rgb: 0, 0, 0;
@@ -14,6 +15,10 @@
     --background-start-rgb: 0, 0, 0;
     --background-end-rgb: 0, 0, 0;
   }
+}
+
+* {
+  font-family: 'Aeonik';
 }
 
 html,
