@@ -10,6 +10,9 @@ export const config = {
 };
 
 async function POST(req: NextApiRequest, res: NextApiResponse) {
+  const accessKeyId = process.env.NEXT_PUBLIC_STORE_ACCESS_KEY_ID;
+  const secretAccessKey = process.env.NEXT_PUBLIC_STORE_SECRET_ACCESS_KEY;
+
   const form = new formidable.IncomingForm();
 
   form.parse(req, async (error: any, fields: any, files: any) => {
@@ -21,8 +24,8 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
       endpoint: process.env.NEXT_PUBLIC_STORE_ENDPOINT,
       region: process.env.NEXT_PUBLIC_STORE_REGION,
       credentials: {
-        accessKeyId: fields.accessKeyId,
-        secretAccessKey: fields.secretAccessKey,
+        accessKeyId: accessKeyId as string,
+        secretAccessKey: secretAccessKey as string,
       },
     });
 
@@ -32,7 +35,7 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
     await s3Client
       .send(
         new PutObjectCommand({
-          Bucket: fields.bucketName,
+          Bucket: process.env.NEXT_PUBLIC_STORE_BUCKET,
           Key: files.file.name,
           Body: rawData,
           ContentType: files.file.type,
