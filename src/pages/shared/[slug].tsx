@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react';
 import { DefaultLayout as Layout } from '@/layouts/default';
 import moment from 'moment';
 import { toast } from 'react-toastify';
+import { bytesToSize } from '@/utils';
 
 import Image from 'next/image';
 import AudioIcon from '@/assets/icons/audio.png';
@@ -18,20 +19,25 @@ import DownloadIcon from '@/assets/icons/download.svg';
 const PreviewPage: NextPage = () => {
   const router = useRouter();
   const { slug } = router.query;
+  const dataQuery = router.query as any;
 
-  const [isExpired, setIsExpired] = useState<boolean>(true);
+  const [isExpired, setIsExpired] = useState<boolean>(false);
   const [fileType, setFileType] = useState<any>(ZipIcon);
 
   useEffect(() => {
-    const now = moment();
-    const expiredAt = moment(router.query['X-Amz-Date'], 'YYYYMMDDHHmmssZ');
-    if (now.isAfter(expiredAt)) {
-      setIsExpired(true);
-      return;
-    }
+    const createdAt = moment(
+      dataQuery['X-Amz-Date'],
+      'YYYYMMDDHHmmssZ'
+    ).toDate();
 
-    setIsExpired(false);
-  }, []);
+    if (createdAt) {
+      const expiresAt = moment(createdAt).add(2, 'day').toDate();
+      if (moment().isAfter(expiresAt)) {
+        setIsExpired(true);
+        toast.error('The file is no longer available.');
+      }
+    }
+  }, [dataQuery]);
 
   useEffect(() => {
     const type = slug?.toString().split('.').pop();
@@ -40,20 +46,29 @@ const PreviewPage: NextPage = () => {
         setFileType(PdfIcon);
         break;
       case 'docx':
+      case 'doc':
         setFileType(DocxIcon);
         break;
       case 'zip':
+      case 'rar':
         setFileType(ZipIcon);
         break;
       case 'mp3':
+      case 'wav':
         setFileType(AudioIcon);
         break;
       case 'mp4':
+      case 'mov':
+      case 'avi':
+      case 'mkv':
         setFileType(VideoIcon);
         break;
       case 'png':
       case 'jpg':
       case 'jpeg':
+      case 'gif':
+      case 'svg':
+      case 'webp':
         setFileType(ImageIcon);
         break;
       default:
@@ -64,7 +79,7 @@ const PreviewPage: NextPage = () => {
 
   const downloadFile = async () => {
     const bucket = process.env.NEXT_PUBLIC_STORE_BUCKET;
-    const file = router.asPath.replace('/shared/', '');
+    const file = router.asPath.replace('/shared/', '').split('&size=')[0];
     const url = `https://${bucket}.s3.amazonaws.com/${file}`;
     window.open(url, '_blank');
     // const blob = await fetch(url).then((r) => r.blob());
@@ -76,21 +91,30 @@ const PreviewPage: NextPage = () => {
 
   return (
     <Layout>
-      <div className="mt-[30px] bg-white rounded-xl w-full md:w-[420px] max-w-[420px] p-6 md:px-[60px] md:py-[50px] flex flex-col gap-5 justify-center items-center">
+      <div className="mt-[30px] bg-white rounded-xl w-full md:min-w-[420px] p-6 md:px-[60px] md:py-[50px] flex flex-col gap-5 justify-center items-center text-center">
         {isExpired ? (
           <>
-            <Image src={DataExpiredIcon} alt="DataExpiredIcon" height={100} />
+            <Image
+              src={DataExpiredIcon}
+              alt="DataExpiredIcon"
+              height={100}
+              priority
+            />
             <div className="text-neutral-2 text-[14px] font-normal leading-normal">
               The file is no longer available.
             </div>
           </>
         ) : (
           <>
-            <div className="text-primary text-[28px] font-medium leading-normal flex items-center justify-center gap-[10px]">
-              <Image src={fileType} alt="fileType" height={28} />
-              <span className="truncate">{slug}</span>
+            <div className="font-medium">
+              <div className="text-[28px] leading-normal flex items-center justify-center gap-[10px]">
+                <Image src={fileType} alt="fileType" height={28} />
+                <span className="truncate text-primary">{slug}</span>
+              </div>
+              <div className="text-neutral-2 text-[24px] ">
+                {bytesToSize(dataQuery.size)}
+              </div>
             </div>
-            <div>{router.query.size}</div>
             <div className="text-neutral-2 text-[14px] font-normal leading-normal">
               No preview available
             </div>

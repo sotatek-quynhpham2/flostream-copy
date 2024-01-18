@@ -11,7 +11,12 @@ import { bytesToSize } from '@/utils';
 import { toast } from 'react-toastify';
 import * as zip from '@zip.js/zip.js';
 
-const MainLeft = ({ setIsLoading, setFilePreview, setPresignedUrl }: any) => {
+const MainLeft = ({
+  isLoading,
+  setIsLoading,
+  setFilePreview,
+  setPresignedUrl,
+}: any) => {
   const [files, setFiles] = useState<any>([]);
   const limitSize = 1000000000; // 1GB
 
@@ -64,7 +69,7 @@ const MainLeft = ({ setIsLoading, setFilePreview, setPresignedUrl }: any) => {
     setFiles(newFiles);
   };
 
-  const uploadFile = async (file:any) => {
+  const uploadFile = async (file: any) => {
     const formData = new FormData();
     formData.append('file', file);
 
@@ -197,10 +202,15 @@ const MainLeft = ({ setIsLoading, setFilePreview, setPresignedUrl }: any) => {
           </div>
 
           <button
-            className="w-full h-10 rounded-[10px] bg-primary text-white text-[16px] font-medium flex items-center justify-center gap-1"
+            className="w-full h-10 rounded-[10px] bg-primary text-white text-[16px] font-medium flex items-center justify-center gap-1 disabled:bg-opacity-50 disabled:cursor-not-allowed"
             onClick={() => handleSend()}
+            disabled={isLoading}
           >
-            <Image src={SendIcon} height={24} alt="SendIcon" priority />
+            <Image
+              src={SendIcon}
+              height={24}
+              alt="SendIcon"
+            />
             Send
           </button>
         </div>

@@ -9,7 +9,7 @@ import { toast } from 'react-toastify';
 
 const MainRight = ({ isLoading, filePreview, presignedUrl }: any) => {
   const router = useRouter();
-  const slug = presignedUrl.split('s3.amazonaws.com/').pop();
+  const slug = presignedUrl.split('s3.amazonaws.com/').pop()+`&size=${filePreview?.size}`;
   const [sharedUrl, setSharedUrl] = useState<string>('');
 
   useEffect(() => {
@@ -23,7 +23,7 @@ const MainRight = ({ isLoading, filePreview, presignedUrl }: any) => {
     `}
     >
       {isLoading && (
-        <div className="mt-3 flex justify-center items-center h-full">
+        <div className="flex justify-center items-center h-full">
           <Image
             src={LoadingIcon}
             alt="Loading"
@@ -43,7 +43,7 @@ const MainRight = ({ isLoading, filePreview, presignedUrl }: any) => {
           <div className="mt-3 border border-neutral-4 rounded-[10px] flex items-center justify-between">
             <div
               className="px-[16px] py-3 text-neutral-1 text-[16px] font-normal leading-normal cursor-pointer truncate"
-              onClick={() => window.open(sharedUrl, '_blank')}
+              onClick={() => router.push(sharedUrl)}
             >
               {sharedUrl}
             </div>
