@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
@@ -10,16 +9,12 @@ import { toast } from 'react-toastify';
 
 const MainRight = ({ isLoading, filePreview, presignedUrl }: any) => {
   const router = useRouter();
-  const slug = presignedUrl.split('.amazonaws.com/').pop();
+  const slug = presignedUrl.split('s3.amazonaws.com/').pop();
   const [sharedUrl, setSharedUrl] = useState<string>('');
 
   useEffect(() => {
     setSharedUrl(`${window.location.origin}/shared/${slug}`);
   }, [presignedUrl]);
-
-  const previewUrl = (url: string) => {
-    router.push(`/shared/${slug}`);
-  };
 
   return (
     <div
@@ -48,7 +43,7 @@ const MainRight = ({ isLoading, filePreview, presignedUrl }: any) => {
           <div className="mt-3 border border-neutral-4 rounded-[10px] flex items-center justify-between">
             <div
               className="px-[16px] py-3 text-neutral-1 text-[16px] font-normal leading-normal cursor-pointer truncate"
-              onClick={() => previewUrl(presignedUrl)}
+              onClick={() => window.open(sharedUrl, '_blank')}
             >
               {sharedUrl}
             </div>
