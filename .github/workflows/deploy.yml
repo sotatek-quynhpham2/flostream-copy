@@ -1,9 +1,9 @@
-name: Deployment develop
+name: Deployment
 
 on:
   push:
     branches:
-      - develop
+      - main
 
 jobs:
   deploy:
@@ -21,7 +21,7 @@ jobs:
             source ~/.nvm/nvm.sh
             nvm use 20
             cd flostream-storage
-            git pull origin develop
+            git pull origin main
             cp .env.example .env
             yarn
             yarn build
