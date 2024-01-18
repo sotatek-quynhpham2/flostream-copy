@@ -1,22 +1,34 @@
 import Link from 'next/link';
-import React from 'react';
+import { useRouter } from 'next/router';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import LoadingIcon from '@/assets/icons/loading.svg';
 import CopyIcon from '@/assets/icons/copy.svg';
+import { bytesToSize } from '@/utils';
 
 import { toast } from 'react-toastify';
 
-const MainRight = ({ isLoading, presignedUrl }: any) => {
+const MainRight = ({ isLoading, filePreview, presignedUrl }: any) => {
+  const router = useRouter();
+  const slug = presignedUrl.split('.amazonaws.com/').pop();
+  const [sharedUrl, setSharedUrl] = useState<string>('');
+
+  useEffect(() => {
+    setSharedUrl(`${window.location.origin}/shared/${slug}`);
+  }, [presignedUrl]);
+
   const previewUrl = (url: string) => {
-    
+    router.push(`/shared/${slug}`);
   };
 
   return (
-    <div className={`h-full bg-white rounded-xl md:rounded-l-[0px] p-6 md:px-[60px] md:py-[50px]
+    <div
+      className={`h-full bg-white rounded-xl md:rounded-l-[0px] p-6 md:px-[60px] md:py-[50px]
       ${!isLoading && !presignedUrl && 'max-md:hidden'}
-    `}>
+    `}
+    >
       {isLoading && (
-        <div className="flex justify-center items-center h-full">
+        <div className="mt-3 flex justify-center items-center h-full">
           <Image
             src={LoadingIcon}
             alt="Loading"
@@ -25,22 +37,29 @@ const MainRight = ({ isLoading, presignedUrl }: any) => {
           />
         </div>
       )}
-      {!isLoading && presignedUrl && (
+      {!isLoading && filePreview && presignedUrl && (
         <>
-          <div className="border border-neutral-4 rounded-[10px] flex items-center justify-between">
-            <div className="px-[16px] py-3 text-neutral-1 text-[16px] font-normal leading-normal cursor-pointer"
+          <div className="flex gap-[10px] text-[20px] font-medium leading-normal">
+            <span className="text-primary">{filePreview.name}</span>{' '}
+            <span className="text-neutral-2">
+              {bytesToSize(filePreview.size)}
+            </span>
+          </div>
+          <div className="mt-3 border border-neutral-4 rounded-[10px] flex items-center justify-between">
+            <div
+              className="px-[16px] py-3 text-neutral-1 text-[16px] font-normal leading-normal cursor-pointer truncate"
               onClick={() => previewUrl(presignedUrl)}
             >
-              {presignedUrl}
+              {sharedUrl}
             </div>
-            <div className="px-[16px] py-3 flex items-center border-l border-neutral-4">
+            <div className="py-3 border-l flex justify-center gap-3 border-neutral-4 w-full max-w-[50px] min-w-[50px]">
               <Image
                 src={CopyIcon}
                 height={24}
                 alt="CopyIcon"
                 className="cursor-pointer"
                 onClick={() => {
-                  navigator.clipboard.writeText(presignedUrl);
+                  navigator.clipboard.writeText(sharedUrl);
                   toast.success('Copied to clipboard!');
                 }}
               />

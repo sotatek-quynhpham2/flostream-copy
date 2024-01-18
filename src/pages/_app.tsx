@@ -17,7 +17,7 @@ function App({ Component, pageProps }: AppProps) {
       }}
     >
       <Component {...pageProps} />
-      <ToastContainer autoClose={20000}/>
+      <ToastContainer/>
     </AuthContext.Provider>
   );
 }

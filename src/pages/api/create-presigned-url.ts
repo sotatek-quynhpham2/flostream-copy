@@ -8,7 +8,7 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
 
   const body = JSON.parse(req.body);
 
-  const expiresIn = 86400; // 24 hours
+  const expiresIn = 172800; // 48 hours
 
   const s3Client = new S3Client({
     endpoint: process.env.NEXT_PUBLIC_STORE_ENDPOINT,

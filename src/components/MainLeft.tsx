@@ -6,30 +6,48 @@ import ReloadIcon from '@/assets/icons/reload.svg';
 import DotIcon from '@/assets/icons/dot.svg';
 import TrashIcon from '@/assets/icons/trash.svg';
 import SendIcon from '@/assets/icons/send.svg';
+import { bytesToSize } from '@/utils';
 
 import { toast } from 'react-toastify';
+import * as zip from '@zip.js/zip.js';
 
-const MainLeft = ({ setIsLoading, setPresignedUrl }: any) => {
-  const [fileInput, setFileInput] = useState<File | null>(null);
+const MainLeft = ({ setIsLoading, setFilePreview, setPresignedUrl }: any) => {
   const [files, setFiles] = useState<any>([]);
-
-  const limitSize = 1000000000;
-
-  const bytesToSize = (bytes: number) => {
-    if (bytes === 0) return '0 MB';
-    const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`;
-  };
+  const limitSize = 1000000000; // 1GB
 
   const filesSize = () => {
     return files.reduce((acc: number, file: any) => acc + file.size, 0);
   };
 
-  const handleUpload = (e: any) => {
+  const fileToBlob = async (file: File) => {
+    const blob = await new Response(file).blob();
+    return blob;
+  };
+
+  const compressFiles = async (files: [any]) => {
+    const zipWriter = new zip.ZipWriter(new zip.BlobWriter('application/zip'));
+    for (const file of files) {
+      const blob = await fileToBlob(file);
+      await zipWriter.add(file.name, new zip.BlobReader(blob));
+    }
+    return zipWriter.close();
+  };
+
+  const handleChangeFile = (e: any) => {
     const newFiles = Array.from(e.target.files);
-    setFiles([...files, ...newFiles]);
+    const temp = [...files];
+    newFiles.forEach((file: any) => {
+      if (temp.findIndex((f: any) => f.name === file.name) === -1) {
+        temp.unshift(file);
+      } else {
+        temp.splice(
+          temp.findIndex((f: any) => f.name === file.name),
+          1
+        );
+        temp.unshift(file);
+      }
+    });
+    setFiles(temp);
   };
 
   useEffect(() => {
@@ -46,17 +64,65 @@ const MainLeft = ({ setIsLoading, setPresignedUrl }: any) => {
     setFiles(newFiles);
   };
 
-  const handleSend = () => {
-    if(filesSize() > limitSize) {
-      toast.warning('Total files must not exceed 1GB.');
+  const uploadFile = async (file:any) => {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    await fetch('/api/upload-file', {
+      method: 'POST',
+      body: formData,
+    }).then(async (res) => {
+      if (res.ok) {
+        await fetch('/api/create-presigned-url', {
+          method: 'POST',
+          body: JSON.stringify({
+            objectKey: file.name,
+          }),
+        }).then((res) => {
+          if (res.ok) {
+            res.json().then((data) => {
+              setIsLoading(false);
+              setPresignedUrl(data);
+              toast.success('Presigned URL generated!');
+            });
+          } else {
+            res.json().then((data) => {
+              toast.error(data.message);
+            });
+          }
+        });
+      } else {
+        res.json().then((data) => {
+          setIsLoading(false);
+          toast.error(data.message);
+        });
+      }
+    });
+  };
+
+  const handleSend = async () => {
+    setIsLoading(true);
+
+    // 1 file
+    if (files.length === 1) {
+      setFilePreview(files[0]);
+      uploadFile(files[0]);
       return;
     }
-    setIsLoading(true);
-    setTimeout(() => {
-      toast.success('Presigned URL generated.');
-      setIsLoading(false);
-      setPresignedUrl('https://flostream.com');
-    }, 3000);
+
+    // multiple files
+    await compressFiles(files).then((blob: any) => {
+      const name = 'files-' + Date.now() + '.zip';
+      const file = new File([blob], name, { type: 'application/zip' });
+      setFilePreview(file);
+
+      if (file.size > limitSize) {
+        toast.warning('Total files must not exceed 1GB.');
+        setIsLoading(false);
+        return;
+      }
+      uploadFile(file);
+    });
   };
 
   return (
@@ -70,7 +136,7 @@ const MainLeft = ({ setIsLoading, setPresignedUrl }: any) => {
         className="hidden"
         id="input-file"
         onChange={(e) => {
-          handleUpload(e);
+          handleChangeFile(e);
         }}
       />
       <div
