@@ -17,7 +17,7 @@ function App({ Component, pageProps }: AppProps) {
       }}
     >
       <Component {...pageProps} />
-      <ToastContainer />
+      <ToastContainer/>
     </AuthContext.Provider>
   );
 }
