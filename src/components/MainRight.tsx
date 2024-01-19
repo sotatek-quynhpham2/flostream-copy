@@ -35,8 +35,8 @@ const MainRight = ({ isLoading, filePreview, presignedUrl }: any) => {
       {!isLoading && filePreview && presignedUrl && (
         <>
           <div className="flex gap-[10px] text-[20px] font-medium leading-normal">
-            <span className="text-primary">{filePreview.name}</span>{' '}
-            <span className="text-neutral-2">
+            <span className="text-primary">{filePreview.name}</span>
+            <span className="text-neutral-2 whitespace-nowrap">
               {bytesToSize(filePreview.size)}
             </span>
           </div>

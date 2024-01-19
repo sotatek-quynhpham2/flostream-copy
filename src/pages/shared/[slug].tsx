@@ -106,10 +106,10 @@ const PreviewPage: NextPage = () => {
           </>
         ) : (
           <>
-            <div className="font-medium">
+            <div className="font-medium w-full">
               <div className="text-[28px] leading-normal flex items-center justify-center gap-[10px]">
                 <Image src={fileType} alt="fileType" height={28} />
-                <span className="truncate text-primary">{slug}</span>
+                <span className=" text-primary w-full">{slug}</span>
               </div>
               <div className="text-neutral-2 text-[24px] ">
                 {bytesToSize(dataQuery.size)}
