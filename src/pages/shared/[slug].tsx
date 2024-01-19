@@ -91,7 +91,7 @@ const PreviewPage: NextPage = () => {
 
   return (
     <Layout>
-      <div className="mt-[30px] bg-white rounded-xl w-full md:min-w-[420px] p-6 md:px-[60px] md:py-[50px] flex flex-col gap-5 justify-center items-center text-center">
+      <div className="mt-[30px] bg-white rounded-xl max-w-[420px] mx-auto p-6 md:px-[60px] md:py-[50px] flex flex-col gap-5 justify-center items-center text-center">
         {isExpired ? (
           <>
             <Image
