@@ -78,23 +78,10 @@ const MainLeft = ({
       body: formData,
     }).then(async (res) => {
       if (res.ok) {
-        await fetch('/api/create-presigned-url', {
-          method: 'POST',
-          body: JSON.stringify({
-            objectKey: file.name,
-          }),
-        }).then((res) => {
-          if (res.ok) {
-            res.json().then((data) => {
-              setIsLoading(false);
-              setPresignedUrl(data);
-              toast.success('Presigned URL generated!');
-            });
-          } else {
-            res.json().then((data) => {
-              toast.error(data.message);
-            });
-          }
+        res.json().then((data) => {
+          setIsLoading(false);
+          setPresignedUrl(data);
+          toast.success('Presigned URL generated!');
         });
       } else {
         res.json().then((data) => {
@@ -110,23 +97,30 @@ const MainLeft = ({
 
     // 1 file
     if (files.length === 1) {
-      setFilePreview(files[0]);
-      uploadFile(files[0]);
+      const name =
+        files[0].name.split('.')[0] +
+        '-' +
+        Date.now() +
+        '.' +
+        files[0].name.split('.').pop();
+      const customFile = new File([files[0]], name, { type: files[0].type });
+      setFilePreview(customFile);
+      uploadFile(customFile);
       return;
     }
 
     // multiple files
     await compressFiles(files).then((blob: any) => {
       const name = 'files-' + Date.now() + '.zip';
-      const file = new File([blob], name, { type: 'application/zip' });
-      setFilePreview(file);
+      const zipFile = new File([blob], name, { type: 'application/zip' });
+      setFilePreview(zipFile);
 
-      if (file.size > limitSize) {
+      if (zipFile.size > limitSize) {
         toast.warning('Total files must not exceed 1GB.');
         setIsLoading(false);
         return;
       }
-      uploadFile(file);
+      uploadFile(zipFile);
     });
   };
 
@@ -206,11 +200,7 @@ const MainLeft = ({
             onClick={() => handleSend()}
             disabled={isLoading}
           >
-            <Image
-              src={SendIcon}
-              height={24}
-              alt="SendIcon"
-            />
+            <Image src={SendIcon} height={24} alt="SendIcon" />
             Send
           </button>
         </div>
