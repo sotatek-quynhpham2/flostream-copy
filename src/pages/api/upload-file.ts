@@ -1,5 +1,10 @@
 import type { NextApiRequest, NextApiResponse } from 'next';
-import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3';
+import {
+  PutObjectCommand,
+  GetObjectCommand,
+  S3Client,
+} from '@aws-sdk/client-s3';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import formidable from 'formidable-serverless';
 import * as fs from 'fs';
 
@@ -12,6 +17,8 @@ export const config = {
 async function POST(req: NextApiRequest, res: NextApiResponse) {
   const accessKeyId = process.env.NEXT_PUBLIC_STORE_ACCESS_KEY_ID;
   const secretAccessKey = process.env.NEXT_PUBLIC_STORE_SECRET_ACCESS_KEY;
+
+  const expiresIn = 172800; // 48 hours
 
   const form = new formidable.IncomingForm();
 
@@ -41,8 +48,22 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
           ContentType: files.file.type,
         })
       )
-      .then((response) => {
-        res.status(200).json(response);
+      .then(async (response) => {
+        // Create a presigned URL for the uploaded file.
+        await getSignedUrl(
+          s3Client,
+          new GetObjectCommand({
+            Bucket: process.env.NEXT_PUBLIC_STORE_BUCKET,
+            Key: files.file.name,
+          }),
+          { expiresIn: expiresIn }
+        )
+          .then((response) => {
+            res.status(200).json(response);
+          })
+          .catch((error) => {
+            res.status(500).json(error);
+          });
       })
       .catch((error) => {
         res.status(500).json(error);

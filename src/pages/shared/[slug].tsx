@@ -82,11 +82,6 @@ const PreviewPage: NextPage = () => {
     const file = router.asPath.replace('/shared/', '').split('&size=')[0];
     const url = `https://${bucket}.s3.amazonaws.com/${file}`;
     window.open(url, '_blank');
-    // const blob = await fetch(url).then((r) => r.blob());
-    // const link = document.createElement('a');
-    // link.href = window.URL.createObjectURL(blob);
-    // link.download = slug as string;
-    // link.click();
   };
 
   return (
@@ -106,7 +101,7 @@ const PreviewPage: NextPage = () => {
           </>
         ) : (
           <>
-            <div className="font-medium w-full">
+            <div className="font-medium">
               <div className="text-[28px] leading-normal flex items-center justify-center gap-[10px]">
                 <Image src={fileType} alt="fileType" height={28} />
                 <span className=" text-primary w-full">{slug}</span>
