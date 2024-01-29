@@ -1,16 +1,8 @@
 import Head from 'next/head';
-import React, { useEffect, useState } from 'react';
-import { useRouter } from 'next/router';
+import React from 'react';
 import Header from '@/components/Header';
 
 export const DefaultLayout = ({ children }: any) => {
-  const router = useRouter();
-  const [host, setHost] = useState<string>('');
-
-  useEffect(() => {
-    setHost(window.location.host);
-  }, []);
-
   return (
     <>
       <Head>

@@ -1,4 +1,3 @@
-import Link from 'next/link';
 import React, { useState, useEffect } from 'react';
 import Image from 'next/image';
 import FilePlusIcon from '@/assets/icons/file-plus.svg';
@@ -7,7 +6,6 @@ import DotIcon from '@/assets/icons/dot.svg';
 import TrashIcon from '@/assets/icons/trash.svg';
 import SendIcon from '@/assets/icons/send.svg';
 import { bytesToSize } from '@/utils';
-
 import { toast } from 'react-toastify';
 import * as zip from '@zip.js/zip.js';
 
