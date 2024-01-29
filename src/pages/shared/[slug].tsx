@@ -23,6 +23,9 @@ const PreviewPage: NextPage = () => {
 
   const [isExpired, setIsExpired] = useState<boolean>(false);
   const [fileType, setFileType] = useState<any>(ZipIcon);
+  const [isMp4, setIsMp4] = useState<boolean>(false);
+  const [isImage, setIsImage] = useState<boolean>(false);
+  const [s3AssetUrl, setS3AssetUrl] = useState<string>('');
 
   useEffect(() => {
     const createdAt = moment(
@@ -41,6 +44,10 @@ const PreviewPage: NextPage = () => {
 
   useEffect(() => {
     const type = slug?.toString().split('.').pop();
+    const bucket = process.env.NEXT_PUBLIC_STORE_BUCKET;
+    const file = router.asPath.replace('/shared/', '').split('&size=')[0];
+    const url = `https://${bucket}.s3.amazonaws.com/${file}`;
+    setS3AssetUrl(url);
     switch (type) {
       case 'pdf':
         setFileType(PdfIcon);
@@ -58,6 +65,9 @@ const PreviewPage: NextPage = () => {
         setFileType(AudioIcon);
         break;
       case 'mp4':
+        setFileType(VideoIcon);
+        setIsMp4(true);
+        break;
       case 'mov':
       case 'avi':
       case 'mkv':
@@ -69,6 +79,7 @@ const PreviewPage: NextPage = () => {
       case 'gif':
       case 'svg':
       case 'webp':
+        setIsImage(true);
         setFileType(ImageIcon);
         break;
       default:
@@ -86,7 +97,7 @@ const PreviewPage: NextPage = () => {
 
   return (
     <Layout>
-      <div className="mt-[30px] bg-white rounded-xl max-w-[420px] mx-auto p-6 md:px-[60px] md:py-[50px] flex flex-col gap-5 justify-center items-center text-center">
+      <div className="mt-[30px] bg-white rounded-xl max-w-[1200px] mx-auto p-6 md:px-[60px] md:py-[50px] flex flex-col gap-5 justify-center items-center text-center">
         {isExpired ? (
           <>
             <Image
@@ -110,9 +121,16 @@ const PreviewPage: NextPage = () => {
                 {bytesToSize(dataQuery.size)}
               </div>
             </div>
-            <div className="text-neutral-2 text-[14px] font-normal leading-normal">
-              No preview available
-            </div>
+            {isMp4 ? (
+              <video src={s3AssetUrl} controls className="max-w-full" />
+            ) : isImage ? (
+              <img src={s3AssetUrl} className="max-w-full" alt="Preview" />
+            ) : (
+              <div className="text-neutral-2 text-[14px] font-normal leading-normal">
+                No preview available
+              </div>
+            )}
+
             <button
               className="bg-primary text-white rounded-[10px] py-2 px-6 text-[16px] font-medium flex justify-center items-center gap-2"
               onClick={() => downloadFile()}
