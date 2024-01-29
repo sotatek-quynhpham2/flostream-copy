@@ -18,7 +18,7 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
   const accessKeyId = process.env.NEXT_PUBLIC_STORE_ACCESS_KEY_ID;
   const secretAccessKey = process.env.NEXT_PUBLIC_STORE_SECRET_ACCESS_KEY;
 
-  const expiresIn = 172800; // 48 hours
+  const expiresIn = 86400; // 24 hours
 
   const form = new formidable.IncomingForm();
 

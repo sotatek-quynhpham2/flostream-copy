@@ -61,8 +61,7 @@ const MainRight = ({ isLoading, filePreview, presignedUrl }: any) => {
             </div>
           </div>
           <div className="mt-2 text-neutral-2 text-[14px] font-normal leading-normal">
-            <strong>Copy link to share. </strong>Your file will be available for
-            48 hours.
+            <strong>Copy link to share. </strong>Your file will be available for 24 hours.
           </div>
         </>
       )}
