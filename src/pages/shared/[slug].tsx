@@ -89,10 +89,7 @@ const PreviewPage: NextPage = () => {
   }, [slug]);
 
   const downloadFile = async () => {
-    const bucket = process.env.NEXT_PUBLIC_STORE_BUCKET;
-    const file = router.asPath.replace('/shared/', '').split('&size=')[0];
-    const url = `https://${bucket}.s3.amazonaws.com/${file}`;
-    window.open(url, '_blank');
+    window.open(s3AssetUrl, '_blank');
   };
 
   return (
