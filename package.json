@@ -13,6 +13,7 @@
     "@aws-sdk/s3-request-presigner": "^3.489.0",
     "@zip.js/zip.js": "^2.7.32",
     "axios": "^1.6.4",
+    "bignumber.js": "4.0.4",
     "formidable-serverless": "^1.1.1",
     "framer-motion": "^10.17.12",
     "fs": "^0.0.1-security",

@@ -8,6 +8,7 @@ import SendIcon from '@/assets/icons/send.svg';
 import { bytesToSize } from '@/utils';
 import { toast } from 'react-toastify';
 import * as zip from '@zip.js/zip.js';
+import BigNumber from 'bignumber.js';
 
 const MainLeft = ({
   isLoading,
@@ -16,8 +17,7 @@ const MainLeft = ({
   setPresignedUrl,
 }: any) => {
   const [files, setFiles] = useState<any>([]);
-  const [disableDel, setDisableDel] = useState<boolean>(false);
-  const limitSize = 20000000000; // 1GB
+  const limitSize = new BigNumber(20).mul(1024).mul(1024).mul(1024).toString();
 
   const filesSize = () => {
     return files.reduce((acc: number, file: any) => acc + file.size, 0);
@@ -64,11 +64,19 @@ const MainLeft = ({
   const handleReset = () => {
     setFiles([]);
     setPresignedUrl('');
+    const inputFile = document.getElementById('input-file') as HTMLInputElement;
+    if (inputFile) {
+      inputFile.value = '';
+    }
   };
 
   const handleRemoveFile = (name: string) => {
     const newFiles = files.filter((file: any) => file.name !== name);
     setFiles(newFiles);
+    const inputFile = document.getElementById('input-file') as HTMLInputElement;
+    if (inputFile) {
+      inputFile.value = '';
+    }
   };
 
   const uploadFile = async (file: any) => {
@@ -119,7 +127,10 @@ const MainLeft = ({
       const zipFile = new File([blob], name, { type: 'application/zip' });
       setFilePreview(zipFile);
 
-      if (zipFile.size > limitSize) {
+      if (
+        new BigNumber(zipFile.size).gt(limitSize) ||
+        new BigNumber(filesSize()).gt(limitSize)
+      ) {
         toast.warning('Total files must not exceed 1GB.');
         setIsLoading(false);
         return;
@@ -155,7 +166,9 @@ const MainLeft = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-[16px] font-normal leading-normal">
               <span className="text-neutral-2">
-                Total <strong>{files.length}</strong> files
+                Total <strong>{files.length}</strong> {
+                  files.length === 1 ? 'file' : 'files'
+                }
               </span>
               <span className="text-neutral-3 border-l border-neutral-4 pl-2">
                 {bytesToSize(filesSize())}
