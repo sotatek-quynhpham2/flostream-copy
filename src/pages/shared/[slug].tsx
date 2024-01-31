@@ -23,6 +23,7 @@ const PreviewPage: NextPage = () => {
 
   const [isExpired, setIsExpired] = useState<boolean>(false);
   const [iconType, setIconType] = useState<any>(ZipIcon);
+  const [assetType, setAssetType] = useState<any>('');
   const [isMp4, setIsMp4] = useState<boolean>(false);
   const [isImage, setIsImage] = useState<boolean>(false);
   const [s3AssetUrl, setS3AssetUrl] = useState<string>('');
@@ -44,6 +45,7 @@ const PreviewPage: NextPage = () => {
 
   useEffect(() => {
     const type = slug?.toString().split('.').pop()?.toLowerCase();
+    setAssetType(type);
     const bucket = process.env.NEXT_PUBLIC_STORE_BUCKET;
     const file = router.asPath.replace('/shared/', '').split('&size=')[0];
     const url = `https://${bucket}.s3.amazonaws.com/${file}`;
@@ -102,20 +104,12 @@ const PreviewPage: NextPage = () => {
     if (response.status !== 200) {
       console.error(response.status, response.statusText);
     }
-
-    if (isMp4 || isImage) {
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = slug ? slug.toString() : 'flostream';
-      link.click();
-    } else {
-      const link = document.createElement('a');
-      link.href = s3AssetUrl;
-      link.download = slug ? slug.toString() : 'flostream';
-      link.click();
-    }
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = slug ? slug.toString() : 'flostream';
+    link.click();
   };
 
   return (
