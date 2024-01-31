@@ -71,6 +71,7 @@ const PreviewPage: NextPage = () => {
       case 'mov':
       case 'avi':
       case 'mkv':
+      case 'webm':
         setFileType(VideoIcon);
         break;
       case 'png':
