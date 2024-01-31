@@ -22,7 +22,7 @@ const PreviewPage: NextPage = () => {
   const dataQuery = router.query as any;
 
   const [isExpired, setIsExpired] = useState<boolean>(false);
-  const [fileType, setFileType] = useState<any>(ZipIcon);
+  const [iconType, setIconType] = useState<any>(ZipIcon);
   const [isMp4, setIsMp4] = useState<boolean>(false);
   const [isImage, setIsImage] = useState<boolean>(false);
   const [s3AssetUrl, setS3AssetUrl] = useState<string>('');
@@ -50,29 +50,29 @@ const PreviewPage: NextPage = () => {
     setS3AssetUrl(url);
     switch (type) {
       case 'pdf':
-        setFileType(PdfIcon);
+        setIconType(PdfIcon);
         break;
       case 'docx':
       case 'doc':
-        setFileType(DocxIcon);
+        setIconType(DocxIcon);
         break;
       case 'zip':
       case 'rar':
-        setFileType(ZipIcon);
+        setIconType(ZipIcon);
         break;
       case 'mp3':
       case 'wav':
-        setFileType(AudioIcon);
+        setIconType(AudioIcon);
         break;
       case 'mp4':
-        setFileType(VideoIcon);
+        setIconType(VideoIcon);
         setIsMp4(true);
         break;
       case 'mov':
       case 'avi':
       case 'mkv':
       case 'webm':
-        setFileType(VideoIcon);
+        setIconType(VideoIcon);
         break;
       case 'png':
       case 'jpg':
@@ -80,15 +80,18 @@ const PreviewPage: NextPage = () => {
       case 'gif':
       case 'svg':
       case 'webp':
+      case 'avif':
+      case 'jfif':
+      case 'tif':
         setIsImage(true);
-        setFileType(ImageIcon);
+        setIconType(ImageIcon);
         break;
       case 'heic':
       case 'heif':
-        setFileType(ImageIcon);
+        setIconType(ImageIcon);
         break;
       default:
-        setFileType(ZipIcon);
+        setIconType(ZipIcon);
         break;
     }
   }, [slug]);
@@ -133,7 +136,7 @@ const PreviewPage: NextPage = () => {
           <>
             <div className="font-medium">
               <div className="text-[28px] leading-normal flex items-center justify-center gap-[10px]">
-                <Image src={fileType} alt="fileType" height={28} />
+                <Image src={iconType} alt="iconType" height={28} />
                 <span className=" text-primary w-full">{slug}</span>
               </div>
               <div className="text-neutral-2 text-[24px] ">
