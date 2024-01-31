@@ -89,7 +89,21 @@ const PreviewPage: NextPage = () => {
   }, [slug]);
 
   const downloadFile = async () => {
+    const response = await fetch(s3AssetUrl);
+    if (response.status !== 200) {
+      console.error(response.status, response.statusText);
+    }
+
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = slug ? slug.toString() : 'flostream';
+    link.click();
+
     window.open(s3AssetUrl, '_blank');
+
+
   };
 
   return (
