@@ -82,7 +82,7 @@ const MainLeft = ({
   const uploadFile = async (file: any) => {
     const formData = new FormData();
     formData.append('file', file);
-
+    setDisableDel(true)
     await fetch('/api/upload-file', {
       method: 'POST',
       body: formData,
@@ -94,6 +94,7 @@ const MainLeft = ({
           toast.success('Presigned URL generated!');
         });
         files.length = 0
+        setDisableDel(false)
       } else {
         res.json().then((data) => {
           setIsLoading(false);
@@ -153,7 +154,7 @@ const MainLeft = ({
         }}
       />
       <div
-        className="mt-3 border border-dashed border-primary rounded-xl bg-[rgba(255, 233, 225, 0.25)] p-[30px] flex flex-col justify-center items-center cursor-pointer"
+        className="mt-3 border border-dashed border-primary rounded-xl bg-add-file p-[30px] flex flex-col justify-center items-center cursor-pointer"
         onClick={() => document.getElementById('input-file')?.click()}
       >
         <Image src={FilePlusIcon} width={48} height={48} alt="FilePlusIcon" />
@@ -175,6 +176,7 @@ const MainLeft = ({
             </div>
             <button
               className="flex items-center gap-2 text-info text-[16px] font-normal leading-normal"
+              disabled={disableDel}
               onClick={() => handleReset()}
             >
               <Image src={ReloadIcon} height={14} alt="ReloadIcon" />
@@ -184,7 +186,7 @@ const MainLeft = ({
 
           <div
             role="list"
-            className="bg-neutral-5 rounded-xl px-5 py-4 flex flex-col gap-[10px] max-h-[200px] overflow-y-auto"
+            className="bg-neutral-5 rounded-xl px-5 py-4 flex flex-col gap-[10px] max-h-[200px] overflow-y-auto list-file"
           >
             {files.map((file: any) => (
               <div
@@ -196,14 +198,14 @@ const MainLeft = ({
                     <Image src={DotIcon} height={24} alt="DotIcon" />
                     <div className="flex flex-col items-start">
                       <span className="text-neutral-1 text-[16px] font-medium leading-normal flex ">
-                        {file.name}
+                        {file.name.length > 42 ? `${file.name.slice(0, 42)}...` : file.name}
                       </span>
                       <span className="text-neutral-2 text-[12px] font-normal leading-normal">
                         {bytesToSize(file.size)}
                       </span>
                     </div>
                   </div>
-                  <button onClick={() => handleRemoveFile(file.name)}>
+                  <button onClick={() => handleRemoveFile(file.name)} disabled={disableDel} className="min-w-[24px]">
                     <Image src={TrashIcon} height={24} alt="TrashIcon" />
                   </button>
                 </div>
