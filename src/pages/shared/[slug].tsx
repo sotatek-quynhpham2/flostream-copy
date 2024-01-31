@@ -83,6 +83,7 @@ const PreviewPage: NextPage = () => {
       case 'avif':
       case 'jfif':
       case 'tif':
+      case 'tiff':
         setIsImage(true);
         setIconType(ImageIcon);
         break;
