@@ -102,20 +102,12 @@ const PreviewPage: NextPage = () => {
     if (response.status !== 200) {
       console.error(response.status, response.statusText);
     }
-
-    if (isMp4 || isImage) {
-      const blob = await response.blob();
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = slug ? slug.toString() : 'flostream';
-      link.click();
-    } else {
-      const link = document.createElement('a');
-      link.href = s3AssetUrl;
-      link.download = slug ? slug.toString() : 'flostream';
-      link.click();
-    }
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = slug ? slug.toString() : 'flostream';
+    link.click();
   };
 
   return (
