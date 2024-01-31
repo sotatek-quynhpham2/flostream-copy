@@ -43,7 +43,7 @@ const PreviewPage: NextPage = () => {
   }, [dataQuery]);
 
   useEffect(() => {
-    const type = slug?.toString().split('.').pop();
+    const type = slug?.toString().split('.').pop()?.toLowerCase();
     const bucket = process.env.NEXT_PUBLIC_STORE_BUCKET;
     const file = router.asPath.replace('/shared/', '').split('&size=')[0];
     const url = `https://${bucket}.s3.amazonaws.com/${file}`;
@@ -82,6 +82,10 @@ const PreviewPage: NextPage = () => {
         setIsImage(true);
         setFileType(ImageIcon);
         break;
+      case 'heic':
+      case 'heif':
+        setFileType(ImageIcon);
+        break;
       default:
         setFileType(ZipIcon);
         break;
@@ -94,16 +98,16 @@ const PreviewPage: NextPage = () => {
       console.error(response.status, response.statusText);
     }
 
-    const blob = await response.blob();
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = slug ? slug.toString() : 'flostream';
-    link.click();
-
-    window.open(s3AssetUrl, '_blank');
-
-
+    if (isMp4 || isImage) {
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = slug ? slug.toString() : 'flostream';
+      link.click();
+    } else {
+      window.open(s3AssetUrl, '_blank');
+    }
   };
 
   return (
