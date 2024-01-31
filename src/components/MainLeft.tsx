@@ -115,6 +115,13 @@ const MainLeft = ({
         files[0].name.split('.').pop();
       const customFile = new File([files[0]], name, { type: files[0].type });
       setFilePreview(customFile);
+      if (
+        new BigNumber(customFile.size).gt(limitSize)
+      ) {
+        toast.warning('File must not exceed 20GB.');
+        setIsLoading(false);
+        return;
+      }
       uploadFile(customFile);
       return;
     }
@@ -126,8 +133,7 @@ const MainLeft = ({
       setFilePreview(zipFile);
 
       if (
-        new BigNumber(zipFile.size).gt(limitSize) ||
-        new BigNumber(filesSize()).gt(limitSize)
+        new BigNumber(zipFile.size).gt(limitSize)
       ) {
         toast.warning('Total files must not exceed 20GB.');
         setIsLoading(false);
