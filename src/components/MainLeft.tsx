@@ -129,7 +129,7 @@ const MainLeft = ({
         new BigNumber(zipFile.size).gt(limitSize) ||
         new BigNumber(filesSize()).gt(limitSize)
       ) {
-        toast.warning('Total files must not exceed 1GB.');
+        toast.warning('Total files must not exceed 20GB.');
         setIsLoading(false);
         return;
       }
