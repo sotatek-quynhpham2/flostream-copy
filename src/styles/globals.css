@@ -28,3 +28,31 @@ body {
   font-style: normal;
   scroll-behavior: smooth;
 }
+
+.bg-add-file {
+  background-color: rgba(255, 233, 225, 0.25);
+}
+
+.list-file::-webkit-scrollbar {
+  width: 5px;
+
+}
+
+/* Track */
+.list-file::-webkit-scrollbar-track {
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+/* Handle */
+.list-file::-webkit-scrollbar-thumb {
+  -webkit-border-radius: 10px;
+  border-radius: 10px;
+
+}
+
+.list-file::-webkit-scrollbar-thumb:window-inactive {
+  background: #E0E0E4;
+
+}
