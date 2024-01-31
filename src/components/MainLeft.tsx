@@ -153,7 +153,7 @@ const MainLeft = ({
       />
       <div
         className="mt-3 border border-dashed border-primary rounded-xl bg-add-file p-[30px] flex flex-col justify-center items-center cursor-pointer"
-        onClick={() => document.getElementById('input-file')?.click()}
+        onClick={() => isLoading ? '' : document.getElementById('input-file')?.click()}
       >
         <Image src={FilePlusIcon} width={48} height={48} alt="FilePlusIcon" />
         <span className="text-primary text-[16px] font-medium">Add file</span>

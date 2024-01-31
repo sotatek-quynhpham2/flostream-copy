@@ -35,7 +35,6 @@ body {
 
 .list-file::-webkit-scrollbar {
   width: 5px;
-
 }
 
 /* Track */
@@ -49,10 +48,9 @@ body {
 .list-file::-webkit-scrollbar-thumb {
   -webkit-border-radius: 10px;
   border-radius: 10px;
-
+  background: #E0E0E4;
 }
 
 .list-file::-webkit-scrollbar-thumb:window-inactive {
   background: #E0E0E4;
-
 }
