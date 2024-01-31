@@ -16,7 +16,7 @@ const MainLeft = ({
   setPresignedUrl,
 }: any) => {
   const [files, setFiles] = useState<any>([]);
-  const limitSize = 1000000000; // 1GB
+  const limitSize = 20000000000; // 1GB
 
   const filesSize = () => {
     return files.reduce((acc: number, file: any) => acc + file.size, 0);
@@ -39,10 +39,13 @@ const MainLeft = ({
   const handleChangeFile = (e: any) => {
     const newFiles = Array.from(e.target.files);
     const temp = [...files];
+    console.log(files);
     newFiles.forEach((file: any) => {
       if (temp.findIndex((f: any) => f.name === file.name) === -1) {
         temp.unshift(file);
+        console.log('1');
       } else {
+        console.log('2');
         temp.splice(
           temp.findIndex((f: any) => f.name === file.name),
           1
@@ -81,6 +84,7 @@ const MainLeft = ({
           setPresignedUrl(data);
           toast.success('Presigned URL generated!');
         });
+        files.length = 0
       } else {
         res.json().then((data) => {
           setIsLoading(false);
