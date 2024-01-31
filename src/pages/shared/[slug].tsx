@@ -8,10 +8,10 @@ import { bytesToSize } from '@/utils';
 
 import Image from 'next/image';
 import AudioIcon from '@/assets/icons/audio.png';
-import DocxIcon from '@/assets/icons/docx.png';
+import DocxIcon from '@/assets/icons/docx.svg';
 import ImageIcon from '@/assets/icons/image.png';
-import PdfIcon from '@/assets/icons/pdf.png';
-import VideoIcon from '@/assets/icons/video.png';
+import PdfIcon from '@/assets/icons/pdf.svg';
+import VideoIcon from '@/assets/icons/video.svg';
 import ZipIcon from '@/assets/icons/zip.png';
 import DataExpiredIcon from '@/assets/icons/data-expired.png';
 import DownloadIcon from '@/assets/icons/download.svg';
@@ -129,7 +129,7 @@ const PreviewPage: NextPage = () => {
           <>
             <div className="font-medium">
               <div className="text-[28px] leading-normal flex items-center justify-center gap-[10px]">
-                <Image src={iconType} alt="iconType" height={28} />
+                <Image src={iconType} alt="iconType" height={28} className="object-contain" />
                 <span className=" text-primary w-full">{slug}</span>
               </div>
               <div className="text-neutral-2 text-[24px] ">
