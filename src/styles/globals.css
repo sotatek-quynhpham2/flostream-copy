@@ -54,3 +54,8 @@ body {
 .list-file::-webkit-scrollbar-thumb:window-inactive {
   background: #E0E0E4;
 }
+
+.shadow {
+  box-shadow: 5px 0px 10px 0px rgba(30, 36, 48, 0.08);
+  z-index: 1;
+}
