@@ -107,7 +107,10 @@ const PreviewPage: NextPage = () => {
       link.download = slug ? slug.toString() : 'flostream';
       link.click();
     } else {
-      window.open(s3AssetUrl, '_blank');
+      const link = document.createElement('a');
+      link.href = s3AssetUrl;
+      link.download = slug ? slug.toString() : 'flostream';
+      link.click();
     }
   };
 
