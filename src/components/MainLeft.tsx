@@ -82,7 +82,6 @@ const MainLeft = ({
   const uploadFile = async (file: any) => {
     const formData = new FormData();
     formData.append('file', file);
-    setDisableDel(true)
     await fetch('/api/upload-file', {
       method: 'POST',
       body: formData,
@@ -94,7 +93,6 @@ const MainLeft = ({
           toast.success('Presigned URL generated!');
         });
         files.length = 0
-        setDisableDel(false)
       } else {
         res.json().then((data) => {
           setIsLoading(false);
@@ -176,7 +174,7 @@ const MainLeft = ({
             </div>
             <button
               className="flex items-center gap-2 text-info text-[16px] font-normal leading-normal"
-              disabled={disableDel}
+              disabled={isLoading}
               onClick={() => handleReset()}
             >
               <Image src={ReloadIcon} height={14} alt="ReloadIcon" />
@@ -205,7 +203,7 @@ const MainLeft = ({
                       </span>
                     </div>
                   </div>
-                  <button onClick={() => handleRemoveFile(file.name)} disabled={disableDel} className="min-w-[24px]">
+                  <button onClick={() => handleRemoveFile(file.name)} disabled={isLoading} className="min-w-[24px]">
                     <Image src={TrashIcon} height={24} alt="TrashIcon" />
                   </button>
                 </div>
