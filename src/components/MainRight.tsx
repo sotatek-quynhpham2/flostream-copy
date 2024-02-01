@@ -9,7 +9,9 @@ import { toast } from 'react-toastify';
 
 const MainRight = ({ isLoading, filePreview, presignedUrl }: any) => {
   const router = useRouter();
-  const slug = presignedUrl.split('s3.amazonaws.com/').pop() + `&size=${filePreview?.size}`;
+  const slug =
+    presignedUrl.split('s3.amazonaws.com/').pop() +
+    `&size=${filePreview?.size}`;
   const [sharedUrl, setSharedUrl] = useState<string>('');
 
   useEffect(() => {
@@ -35,7 +37,11 @@ const MainRight = ({ isLoading, filePreview, presignedUrl }: any) => {
       {!isLoading && filePreview && presignedUrl && (
         <>
           <div className="flex gap-[10px] text-[20px] font-medium leading-normal">
-            <span className="text-primary">{filePreview.name > 36 ? `${filePreview.name.slice(0, 36)}...` : filePreview.name}</span>
+            <span className="text-primary">
+              {filePreview.name.length > 36
+                ? `${filePreview.name.slice(0, 36)}...`
+                : filePreview.name}
+            </span>
             <span className="text-neutral-2 whitespace-nowrap">
               {bytesToSize(filePreview.size)}
             </span>
@@ -61,7 +67,8 @@ const MainRight = ({ isLoading, filePreview, presignedUrl }: any) => {
             </div>
           </div>
           <div className="mt-2 text-neutral-2 text-[14px] font-normal leading-normal">
-            <strong>Copy link to share. </strong>Your file will be available for 24 hours.
+            <strong>Copy link to share. </strong>Your file will be available for
+            24 hours.
           </div>
         </>
       )}

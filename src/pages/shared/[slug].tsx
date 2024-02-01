@@ -15,6 +15,7 @@ import VideoIcon from '@/assets/icons/video.svg';
 import ZipIcon from '@/assets/icons/zip.png';
 import DataExpiredIcon from '@/assets/icons/data-expired.png';
 import DownloadIcon from '@/assets/icons/download.svg';
+import LoadingIcon from '@/assets/icons/loading.svg';
 
 const PreviewPage: NextPage = () => {
   const router = useRouter();
@@ -26,6 +27,7 @@ const PreviewPage: NextPage = () => {
   const [isMp4, setIsMp4] = useState<boolean>(false);
   const [isImage, setIsImage] = useState<boolean>(false);
   const [s3AssetUrl, setS3AssetUrl] = useState<string>('');
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
     const createdAt = moment(
@@ -98,11 +100,10 @@ const PreviewPage: NextPage = () => {
   }, [slug]);
 
   const downloadFile = async () => {
+    setIsLoading(true);
     const response = await fetch(s3AssetUrl);
-    if (response.status !== 200) {
-      console.error(response.status, response.statusText);
-    }
     const blob = await response.blob();
+    setIsLoading(false);
     const url = window.URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
@@ -112,7 +113,7 @@ const PreviewPage: NextPage = () => {
 
   return (
     <Layout>
-      <div className="mt-[30px] bg-white rounded-xl max-w-[1200px] mx-auto p-6 md:px-[60px] md:py-[50px] flex flex-col gap-5 justify-center items-center text-center">
+      <div className="relative mt-[30px] bg-white rounded-xl max-w-[1200px] mx-auto p-6 md:px-[60px] md:py-[50px] flex flex-col gap-5 justify-center items-center text-center">
         {isExpired ? (
           <>
             <Image
@@ -154,6 +155,16 @@ const PreviewPage: NextPage = () => {
               Download
             </button>
           </>
+        )}
+        {isLoading && (
+          <div className="absolute top-0 left-0 w-full h-full bg-white bg-opacity-50 flex justify-center items-center">
+            <Image
+              src={LoadingIcon}
+              alt="Loading"
+              height={120}
+              className="animate-spin"
+            />
+          </div>
         )}
       </div>
     </Layout>
