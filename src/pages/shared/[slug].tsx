@@ -162,7 +162,7 @@ const PreviewPage: NextPage = () => {
               src={LoadingIcon}
               alt="Loading"
               height={120}
-              className="animate-spin"
+              className="animate-spin max-md:w-[50px]"
             />
           </div>
         )}
