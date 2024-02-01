@@ -24,8 +24,8 @@ const PreviewPage: NextPage = () => {
 
   const [isExpired, setIsExpired] = useState<boolean>(false);
   const [iconType, setIconType] = useState<any>(ZipIcon);
-  const [isMp4, setIsMp4] = useState<boolean>(false);
-  const [isImage, setIsImage] = useState<boolean>(false);
+  const [videoPreviewable, setVideoPreviewable] = useState<boolean>(false);
+  const [imagePreviewable, setImagePreviewable] = useState<boolean>(false);
   const [s3AssetUrl, setS3AssetUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
@@ -58,22 +58,19 @@ const PreviewPage: NextPage = () => {
       case 'doc':
         setIconType(DocxIcon);
         break;
-      case 'zip':
-      case 'rar':
-        setIconType(ZipIcon);
-        break;
       case 'mp3':
       case 'wav':
         setIconType(AudioIcon);
         break;
       case 'mp4':
+      case 'webm':
+      case 'ogg':
         setIconType(VideoIcon);
-        setIsMp4(true);
+        setVideoPreviewable(true);
         break;
       case 'mov':
       case 'avi':
       case 'mkv':
-      case 'webm':
         setIconType(VideoIcon);
         break;
       case 'png':
@@ -85,7 +82,7 @@ const PreviewPage: NextPage = () => {
       case 'avif':
       case 'jfif':
       case 'tif':
-        setIsImage(true);
+        setImagePreviewable(true);
         setIconType(ImageIcon);
         break;
       case 'tiff':
@@ -137,9 +134,9 @@ const PreviewPage: NextPage = () => {
                 {bytesToSize(dataQuery.size)}
               </div>
             </div>
-            {isMp4 ? (
+            {videoPreviewable ? (
               <video src={s3AssetUrl} controls className="max-w-full" />
-            ) : isImage ? (
+            ) : imagePreviewable ? (
               <img src={s3AssetUrl} className="max-w-full" alt="Preview" />
             ) : (
               <div className="text-neutral-2 text-[14px] font-normal leading-normal">
