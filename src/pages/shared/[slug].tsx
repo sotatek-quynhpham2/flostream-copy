@@ -25,6 +25,7 @@ const PreviewPage: NextPage = () => {
   const [isExpired, setIsExpired] = useState<boolean>(false);
   const [iconType, setIconType] = useState<any>(ZipIcon);
   const [videoPreviewable, setVideoPreviewable] = useState<boolean>(false);
+  const [audioPreviewable, setAudioPreviewable] = useState<boolean>(false);
   const [imagePreviewable, setImagePreviewable] = useState<boolean>(false);
   const [s3AssetUrl, setS3AssetUrl] = useState<string>('');
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -60,11 +61,13 @@ const PreviewPage: NextPage = () => {
         break;
       case 'mp3':
       case 'wav':
+      case 'm4a':
+      case 'ogg':
+        setAudioPreviewable(true);
         setIconType(AudioIcon);
         break;
       case 'mp4':
       case 'webm':
-      case 'ogg':
         setIconType(VideoIcon);
         setVideoPreviewable(true);
         break;
@@ -143,6 +146,8 @@ const PreviewPage: NextPage = () => {
               <video src={s3AssetUrl} controls className="max-w-full" />
             ) : imagePreviewable ? (
               <img src={s3AssetUrl} className="max-w-full" alt="Preview" />
+            ) : audioPreviewable ? (
+              <audio src={s3AssetUrl} controls className="max-w-full" />
             ) : (
               <div className="text-neutral-2 text-[14px] font-normal leading-normal">
                 No preview available
