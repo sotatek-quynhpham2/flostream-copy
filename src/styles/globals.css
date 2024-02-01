@@ -29,33 +29,22 @@ body {
   scroll-behavior: smooth;
 }
 
-.bg-add-file {
-  background-color: rgba(255, 233, 225, 0.25);
-}
-
-.list-file::-webkit-scrollbar {
+::-webkit-scrollbar {
   width: 5px;
 }
 
-/* Track */
-.list-file::-webkit-scrollbar-track {
+::-webkit-scrollbar-track {
   -webkit-border-radius: 10px;
   border-radius: 10px;
   margin-top: 20px;
 }
 
-/* Handle */
-.list-file::-webkit-scrollbar-thumb {
+::-webkit-scrollbar-thumb {
   -webkit-border-radius: 10px;
   border-radius: 10px;
-  background: #E0E0E4;
+  background: #e0e0e4;
 }
 
-.list-file::-webkit-scrollbar-thumb:window-inactive {
-  background: #E0E0E4;
-}
-
-.shadow {
-  box-shadow: 5px 0px 10px 0px rgba(30, 36, 48, 0.08);
-  z-index: 1;
+::-webkit-scrollbar-thumb:window-inactive {
+  background: #e0e0e4;
 }

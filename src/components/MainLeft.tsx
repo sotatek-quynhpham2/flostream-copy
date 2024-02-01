@@ -144,7 +144,7 @@ const MainLeft = ({
   };
 
   return (
-    <div className="h-full bg-white rounded-xl md:rounded-r-[0px] p-6 md:px-[60px] md:py-[50px] shadow">
+    <div className="h-full bg-white rounded-xl md:rounded-r-[0px] p-6 md:px-[60px] md:py-[50px] shadow-[5px_0px_10px_0px_rgba(30,36,48,0.08)] z-[1] ">
       <div className="text-neutral-1 text-[18px] font-bold leading-normal uppercase">
         Send
       </div>
@@ -158,7 +158,7 @@ const MainLeft = ({
         }}
       />
       <div
-        className="mt-3 border border-dashed border-primary rounded-xl bg-add-file p-[30px] flex flex-col justify-center items-center cursor-pointer"
+        className="mt-3 border border-dashed border-primary rounded-xl bg-[#ffe9e140] p-[30px] flex flex-col justify-center items-center cursor-pointer"
         onClick={() => isLoading ? '' : document.getElementById('input-file')?.click()}
       >
         <Image src={FilePlusIcon} width={48} height={48} alt="FilePlusIcon" />
