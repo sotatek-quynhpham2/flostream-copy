@@ -74,14 +74,19 @@ const PreviewPage: NextPage = () => {
         setIconType(VideoIcon);
         break;
       case 'png':
+      case 'apng':
       case 'jpg':
       case 'jpeg':
+      case 'jfif':
+      case 'pjpeg':
+      case 'pjp':
       case 'gif':
       case 'svg':
       case 'webp':
       case 'avif':
-      case 'jfif':
       case 'tif':
+      case 'ico':
+      case 'cur':
         setImagePreviewable(true);
         setIconType(ImageIcon);
         break;
