@@ -20,7 +20,7 @@ const MainRight = ({ isLoading, filePreview, presignedUrl }: any) => {
 
   return (
     <div
-      className={`h-full bg-white rounded-xl md:rounded-l-[0px] p-6 md:px-[60px] md:py-[50px]
+      className={`h-full bg-white rounded-xl md:rounded-l-[0px] p-6 md:px-[60px] md:py-[50px] max-md:mt-4
       ${!isLoading && !presignedUrl && 'max-md:hidden'}
     `}
     >
