@@ -144,7 +144,7 @@ const MainLeft = ({
   };
 
   return (
-    <div className="h-full bg-white rounded-xl md:rounded-r-[0px] p-6 md:px-[60px] md:py-[50px] shadow-[5px_0px_10px_0px_rgba(30,36,48,0.08)] z-[1] ">
+    <div className="h-full bg-white rounded-xl md:rounded-r-[0px] p-6 md:px-[60px] md:py-[50px] md:shadow-[5px_0px_10px_0px_rgba(30,36,48,0.08)] md:z-[1] ">
       <div className="text-neutral-1 text-[18px] font-bold leading-normal uppercase">
         Send
       </div>
