@@ -82,14 +82,14 @@ const PreviewPage: NextPage = () => {
       case 'pjp':
       case 'gif':
       case 'svg':
-      case 'webp':
-      case 'avif':
-      case 'tif':
       case 'ico':
       case 'cur':
+      case 'webp':
         setImagePreviewable(true);
         setIconType(ImageIcon);
         break;
+      case 'avif':
+      case 'tif':
       case 'tiff':
       case 'heic':
       case 'heif':
