@@ -40,13 +40,10 @@ const MainLeft = ({
   const handleChangeFile = (e: any) => {
     const newFiles = Array.from(e.target.files);
     const temp = [...files];
-    console.log(files);
     newFiles.forEach((file: any) => {
       if (temp.findIndex((f: any) => f.name === file.name) === -1) {
         temp.unshift(file);
-        console.log('1');
       } else {
-        console.log('2');
         temp.splice(
           temp.findIndex((f: any) => f.name === file.name),
           1
