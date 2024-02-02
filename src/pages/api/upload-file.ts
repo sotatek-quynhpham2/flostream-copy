@@ -20,7 +20,12 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
 
   const expiresIn = 86400; // 24 hours
 
-  const form = new formidable.IncomingForm();
+  let options = {
+    maxFileSize: 20 * 1024 * 1024 * 1024, // 20 GB
+    allowEmptyFiles: false,
+  };
+
+  const form = new formidable.IncomingForm(options);
 
   form.parse(req, async (error: any, fields: any, files: any) => {
     if (error) {
