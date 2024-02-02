@@ -138,6 +138,11 @@ const MainLeft = ({
       }
       uploadFile(zipFile);
     });
+
+    const inputFile = document.getElementById('input-file') as HTMLInputElement;
+    if (inputFile) {
+      inputFile.value = '';
+    }
   };
 
   return (

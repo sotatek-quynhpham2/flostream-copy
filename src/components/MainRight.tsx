@@ -25,13 +25,19 @@ const MainRight = ({ isLoading, filePreview, presignedUrl }: any) => {
     `}
     >
       {isLoading && (
-        <div className="flex justify-center items-center h-full">
+        <div className="flex justify-center items-center h-full flex-col gap-2 text-center">
           <Image
             src={LoadingIcon}
             alt="Loading"
             height={120}
             className="animate-spin max-md:w-[50px]"
           />
+          <div className="text-[20px] font-medium leading-normal">
+            Uploading...
+          </div>
+          <div className="text-neutral-2 text-[14px] font-normal leading-normal">
+            Your file is being uploaded. Please wait.
+          </div>
         </div>
       )}
       {!isLoading && filePreview && presignedUrl && (
