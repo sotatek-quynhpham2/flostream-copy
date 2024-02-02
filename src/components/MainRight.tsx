@@ -43,10 +43,8 @@ const MainRight = ({ isLoading, filePreview, presignedUrl }: any) => {
       {!isLoading && filePreview && presignedUrl && (
         <>
           <div className="flex gap-[10px] text-[20px] font-medium leading-normal">
-            <span className="text-primary">
-              {filePreview.name.length > 36
-                ? `${filePreview.name.slice(0, 36)}...`
-                : filePreview.name}
+            <span className="text-primary whitespace-nowrap overflow-hidden text-ellipsis">
+              {filePreview.name}
             </span>
             <span className="text-neutral-2 whitespace-nowrap">
               {bytesToSize(filePreview.size)}
