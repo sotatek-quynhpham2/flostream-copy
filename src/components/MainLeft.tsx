@@ -89,7 +89,7 @@ const MainLeft = ({
           setPresignedUrl(data);
           toast.success('Presigned URL generated!');
         });
-        files.length = 0
+        files.length = 0;
       } else {
         res.json().then((data) => {
           setIsLoading(false);
@@ -112,32 +112,32 @@ const MainLeft = ({
         files[0].name.split('.').pop();
       const customFile = new File([files[0]], name, { type: files[0].type });
       setFilePreview(customFile);
-      if (
-        new BigNumber(customFile.size).gt(limitSize)
-      ) {
+      if (new BigNumber(customFile.size).gt(limitSize)) {
         toast.warning('File must not exceed 20GB.');
         setIsLoading(false);
         return;
       }
       uploadFile(customFile);
-      return;
-    }
-
-    // multiple files
-    await compressFiles(files).then((blob: any) => {
-      const name = 'files-' + Date.now() + '.zip';
-      const zipFile = new File([blob], name, { type: 'application/zip' });
-      setFilePreview(zipFile);
-
-      if (
-        new BigNumber(zipFile.size).gt(limitSize)
-      ) {
-        toast.warning('Total files must not exceed 20GB.');
-        setIsLoading(false);
-        return;
+      const inputFile = document.getElementById(
+        'input-file'
+      ) as HTMLInputElement;
+      if (inputFile) {
+        inputFile.value = '';
       }
-      uploadFile(zipFile);
-    });
+    } else if (files.length > 1) {
+      await compressFiles(files).then((blob: any) => {
+        const name = 'files-' + Date.now() + '.zip';
+        const zipFile = new File([blob], name, { type: 'application/zip' });
+        setFilePreview(zipFile);
+
+        if (new BigNumber(zipFile.size).gt(limitSize)) {
+          toast.warning('Total files must not exceed 20GB.');
+          setIsLoading(false);
+          return;
+        }
+        uploadFile(zipFile);
+      });
+    }
 
     const inputFile = document.getElementById('input-file') as HTMLInputElement;
     if (inputFile) {
@@ -161,7 +161,9 @@ const MainLeft = ({
       />
       <div
         className="mt-3 border border-dashed border-primary rounded-xl bg-[#ffe9e140] p-[30px] flex flex-col justify-center items-center cursor-pointer"
-        onClick={() => isLoading ? '' : document.getElementById('input-file')?.click()}
+        onClick={() =>
+          isLoading ? '' : document.getElementById('input-file')?.click()
+        }
       >
         <Image src={FilePlusIcon} width={48} height={48} alt="FilePlusIcon" />
         <span className="text-primary text-[16px] font-medium">Add file</span>
@@ -172,9 +174,8 @@ const MainLeft = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-[16px] font-normal leading-normal">
               <span className="text-neutral-2">
-                Total <strong>{files.length}</strong> {
-                  files.length === 1 ? 'file' : 'files'
-                }
+                Total <strong>{files.length}</strong>{' '}
+                {files.length === 1 ? 'file' : 'files'}
               </span>
               <span className="text-neutral-3 border-l border-neutral-4 pl-2">
                 {bytesToSize(filesSize())}
@@ -204,14 +205,20 @@ const MainLeft = ({
                     <Image src={DotIcon} height={24} alt="DotIcon" />
                     <div className="flex flex-col items-start">
                       <span className="text-neutral-1 text-[16px] font-medium leading-normal flex ">
-                        {file.name.length > 42 ? `${file.name.slice(0, 42)}...` : file.name}
+                        {file.name.length > 42
+                          ? `${file.name.slice(0, 42)}...`
+                          : file.name}
                       </span>
                       <span className="text-neutral-2 text-[12px] font-normal leading-normal">
                         {bytesToSize(file.size)}
                       </span>
                     </div>
                   </div>
-                  <button onClick={() => handleRemoveFile(file.name)} disabled={isLoading} className="min-w-[24px]">
+                  <button
+                    onClick={() => handleRemoveFile(file.name)}
+                    disabled={isLoading}
+                    className="min-w-[24px]"
+                  >
                     <Image src={TrashIcon} height={24} alt="TrashIcon" />
                   </button>
                 </div>
