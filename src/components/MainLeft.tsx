@@ -13,15 +13,13 @@ import BigNumber from 'bignumber.js';
 const MainLeft = ({
   isLoading,
   setIsLoading,
-  setFilePreview,
-  setPresignedUrl,
+  setTotalFiles,
+  setFilesResponse,
 }: any) => {
   const [files, setFiles] = useState<any>([]);
   const limitSize = new BigNumber(20).mul(1024).mul(1024).mul(1024).toString();
 
-  const filesSize = () => {
-    return files.reduce((acc: number, file: any) => acc + file.size, 0);
-  };
+  const [isCompressed, setIsCompressed] = useState(false);
 
   const fileToBlob = async (file: File) => {
     const blob = await new Response(file).blob();
@@ -54,13 +52,8 @@ const MainLeft = ({
     setFiles(temp);
   };
 
-  useEffect(() => {
-    setPresignedUrl('');
-  }, [files]);
-
   const handleReset = () => {
     setFiles([]);
-    setPresignedUrl('');
     const inputFile = document.getElementById('input-file') as HTMLInputElement;
     if (inputFile) {
       inputFile.value = '';
@@ -84,58 +77,55 @@ const MainLeft = ({
       body: formData,
     }).then(async (res) => {
       if (res.ok) {
-        res.json().then((data) => {
-          setIsLoading(false);
-          setPresignedUrl(data);
-          toast.success('Presigned URL generated!');
-        });
-        files.length = 0;
+        setFilesResponse((prev: any) => [
+          ...prev,
+          {
+            name: file.name,
+            size: file.size,
+            status: 'success',
+          },
+        ]);
       } else {
-        res.json().then((data) => {
-          setIsLoading(false);
-          toast.error(data.message);
-        });
+        setFilesResponse((prev: any) => [
+          ...prev,
+          {
+            name: file.name,
+            size: file.size,
+            status: 'failed',
+          },
+        ]);
       }
     });
   };
 
   const handleSend = async () => {
+    setFilesResponse([]);
     setIsLoading(true);
-
-    // 1 file
-    if (files.length === 1) {
-      const name =
-        files[0].name.split('.')[0] +
-        '-' +
-        Date.now() +
-        '.' +
-        files[0].name.split('.').pop();
-      const customFile = new File([files[0]], name, { type: files[0].type });
-      setFilePreview(customFile);
-      if (new BigNumber(customFile.size).gt(limitSize)) {
-        toast.warning('File must not exceed 20GB.');
-        setIsLoading(false);
-        return;
-      }
-      uploadFile(customFile);
-      const inputFile = document.getElementById(
-        'input-file'
-      ) as HTMLInputElement;
-      if (inputFile) {
-        inputFile.value = '';
-      }
-    } else if (files.length > 1) {
-      await compressFiles(files).then((blob: any) => {
+    if (isCompressed) {
+      await compressFiles(files).then(async (blob: any) => {
         const name = 'files-' + Date.now() + '.zip';
         const zipFile = new File([blob], name, { type: 'application/zip' });
-        setFilePreview(zipFile);
 
         if (new BigNumber(zipFile.size).gt(limitSize)) {
           toast.warning('Total files must not exceed 20GB.');
           setIsLoading(false);
           return;
         }
-        uploadFile(zipFile);
+        await uploadFile(zipFile);
+        setTotalFiles(1);
+        setIsLoading(false);
+      });
+    } else {
+      setTotalFiles(files.length);
+      files.forEach(async (file: any) => {
+        const name =
+          file.name.split('.')[0] +
+          '-' +
+          Date.now() +
+          '.' +
+          file.name.split('.').pop();
+        const customFile = new File([file], name, { type: file.type });
+        await uploadFile(customFile);
       });
     }
 
@@ -177,9 +167,20 @@ const MainLeft = ({
                 Total <strong>{files.length}</strong>{' '}
                 {files.length === 1 ? 'file' : 'files'}
               </span>
-              <span className="text-neutral-3 border-l border-neutral-4 pl-2">
-                {bytesToSize(filesSize())}
-              </span>
+              <div className="text-neutral-2 border-l border-neutral-4 pl-2">
+                <input
+                  type="checkbox"
+                  checked={isCompressed}
+                  onChange={() => setIsCompressed(!isCompressed)}
+                  className="mr-2"
+                />
+                <label
+                  className="cursor-pointer"
+                  onClick={() => setIsCompressed(!isCompressed)}
+                >
+                  Compressed?
+                </label>
+              </div>
             </div>
             <button
               className="flex items-center gap-2 text-info text-[16px] font-normal leading-normal"
@@ -190,6 +191,12 @@ const MainLeft = ({
               Reset
             </button>
           </div>
+
+          {isCompressed && (
+            <div className="text-neutral-2 text-[16px] font-normal leading-normal">
+              Your file(s) will be compressed into a zip file.
+            </div>
+          )}
 
           <div
             role="list"

@@ -18,8 +18,6 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
   const accessKeyId = process.env.NEXT_PUBLIC_STORE_ACCESS_KEY_ID;
   const secretAccessKey = process.env.NEXT_PUBLIC_STORE_SECRET_ACCESS_KEY;
 
-  const expiresIn = 86400; // 24 hours
-
   let options = {
     maxFileSize: 20 * 1024 * 1024 * 1024, // 20 GB
     allowEmptyFiles: false,
@@ -54,22 +52,8 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
           ContentType: files.file.type,
         })
       )
-      .then(async (response) => {
-        // Create a presigned URL for the uploaded file.
-        await getSignedUrl(
-          s3Client,
-          new GetObjectCommand({
-            Bucket: process.env.NEXT_PUBLIC_STORE_BUCKET,
-            Key: files.file.name,
-          }),
-          { expiresIn: expiresIn }
-        )
-          .then((response) => {
-            res.status(200).json(response);
-          })
-          .catch((error) => {
-            res.status(500).json(error);
-          });
+      .then((response) => {
+        res.status(200).json(response);
       })
       .catch((error) => {
         res.status(500).json(error);
