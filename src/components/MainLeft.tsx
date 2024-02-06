@@ -107,7 +107,7 @@ const MainLeft = ({
         const zipFile = new File([blob], name, { type: 'application/zip' });
 
         if (new BigNumber(zipFile.size).gt(limitSize)) {
-          toast.warning('Total files must not exceed 20GB.');
+          toast.error('Total files must not exceed 20GB.');
           setIsLoading(false);
           return;
         }

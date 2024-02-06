@@ -7,6 +7,8 @@
   --foreground-rgb: 0, 0, 0;
   --background-start-rgb: 214, 219, 220;
   --background-end-rgb: 255, 255, 255;
+  --toastify-icon-color-error: #fff !important;
+  --toastify-icon-color-success: #fff !important;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -47,4 +49,8 @@ body {
 
 ::-webkit-scrollbar-thumb:window-inactive {
   background: #e0e0e4;
+}
+
+.no-progress-bar .Toastify__progress-bar {
+  opacity: 0 !important;
 }
