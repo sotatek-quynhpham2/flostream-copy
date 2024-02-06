@@ -86,7 +86,7 @@ const MainRight = ({ isLoading, totalFiles, filesResponse }: any) => {
           </div>
           <div className="mt-5 flex flex-col gap-3">
             {filesResponse.map((file: any) => (
-              <div className="mt-3 flex gap-[10px] text-[20px] font-medium leading-normal justify-between">
+              <div key={file.name} className="mt-3 flex gap-[10px] text-[20px] font-medium leading-normal justify-between">
                 <span className="text-primary whitespace-nowrap overflow-hidden text-ellipsis">
                   {file.name}
                 </span>
