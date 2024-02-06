@@ -1,13 +1,19 @@
 import type { NextPage } from 'next';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { DefaultLayout as Layout } from '@/layouts/default';
 import MainLeft from '@/components/MainLeft';
 import MainRight from '@/components/MainRight';
 
 const HomePage: NextPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [filePreview, setFilePreview] = useState<any>(undefined);
-  const [presignedUrl, setPresignedUrl] = useState<string>('');
+  const [totalFiles, setTotalFiles] = useState<number>(0);
+  const [filesResponse, setFilesResponse] = useState<any>([]);
+
+  useEffect(() => {
+    if (filesResponse.length === totalFiles && totalFiles > 0) {
+      setIsLoading(false);
+    }
+  }, [filesResponse]);
 
   return (
     <Layout>
@@ -15,13 +21,13 @@ const HomePage: NextPage = () => {
         <MainLeft
           isLoading={isLoading}
           setIsLoading={setIsLoading}
-          setFilePreview={setFilePreview}
-          setPresignedUrl={setPresignedUrl}
+          setTotalFiles={setTotalFiles}
+          setFilesResponse={setFilesResponse}
         />
         <MainRight
           isLoading={isLoading}
-          filePreview={filePreview}
-          presignedUrl={presignedUrl}
+          totalFiles={totalFiles}
+          filesResponse={filesResponse}
         />
       </div>
     </Layout>
