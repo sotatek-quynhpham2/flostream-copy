@@ -9,6 +9,15 @@ import AuthContext from '@/contexts/AuthContext';
 function App({ Component, pageProps }: AppProps) {
   const [token, setToken] = useState<string>('');
 
+  const contextClass = {
+    success: "bg-success",
+    error: "bg-error",
+    info: "bg-gray-600",
+    warning: "bg-error",
+    default: "bg-indigo-600",
+    dark: "bg-white-600 font-gray-300",
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -17,7 +26,12 @@ function App({ Component, pageProps }: AppProps) {
       }}
     >
       <Component {...pageProps} />
-      <ToastContainer/>
+      <ToastContainer toastClassName={(context) =>
+        contextClass[context?.type || "default"] +
+        " no-progress-bar relative flex p-1 min-h-10 rounded-md justify-between overflow-hidden cursor-pointer"
+      }
+        autoClose={3000}
+      />
     </AuthContext.Provider>
   );
 }
