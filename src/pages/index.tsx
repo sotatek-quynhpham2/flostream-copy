@@ -26,6 +26,7 @@ const HomePage: NextPage = () => {
         />
         <MainRight
           isLoading={isLoading}
+          setIsLoading={setIsLoading}
           totalFiles={totalFiles}
           filesResponse={filesResponse}
         />

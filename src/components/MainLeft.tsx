@@ -114,6 +114,7 @@ const MainLeft = ({
         await uploadFile(zipFile);
         setTotalFiles(1);
         setIsLoading(false);
+        setIsCompressed(false);
       });
     } else {
       setTotalFiles(files.length);
