@@ -10,6 +10,7 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
   const s3Client = new S3Client({
     endpoint: process.env.NEXT_PUBLIC_STORE_ENDPOINT,
     region: process.env.NEXT_PUBLIC_STORE_REGION,
+    forcePathStyle: true,
     credentials: {
       accessKeyId: accessKeyId as string,
       secretAccessKey: secretAccessKey as string,

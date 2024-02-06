@@ -10,12 +10,12 @@ import { toast } from 'react-toastify';
 const MainRight = ({ isLoading, filePreview, presignedUrl }: any) => {
   const router = useRouter();
   const slug =
-    presignedUrl.split('s3.amazonaws.com/').pop() +
+    presignedUrl.split(process.env.NEXT_PUBLIC_STORE_ENDPOINT + `/${process.env.NEXT_PUBLIC_STORE_BUCKET}/`).pop() +
     `&size=${filePreview?.size}`;
   const [sharedUrl, setSharedUrl] = useState<string>('');
 
   useEffect(() => {
-    setSharedUrl(`${window.location.origin}/shared/${slug}`);
+    setSharedUrl(`${window.location.origin}/shared/${process.env.NEXT_PUBLIC_STORE_BUCKET}/${slug}`);
   }, [presignedUrl]);
 
   return (

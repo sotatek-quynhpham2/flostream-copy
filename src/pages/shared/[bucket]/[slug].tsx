@@ -47,9 +47,8 @@ const PreviewPage: NextPage = () => {
 
   useEffect(() => {
     const type = slug?.toString().split('.').pop()?.toLowerCase();
-    const bucket = process.env.NEXT_PUBLIC_STORE_BUCKET;
     const file = router.asPath.replace('/shared/', '').split('&size=')[0];
-    const url = `https://${bucket}.s3.amazonaws.com/${file}`;
+    const url = process.env.NEXT_PUBLIC_STORE_ENDPOINT + `/${file}`;
     setS3AssetUrl(url);
     switch (type) {
       case 'pdf':
