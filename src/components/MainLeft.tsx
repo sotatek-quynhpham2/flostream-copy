@@ -9,6 +9,7 @@ import { bytesToSize } from '@/utils';
 import { toast } from 'react-toastify';
 import * as zip from '@zip.js/zip.js';
 import BigNumber from 'bignumber.js';
+import { log } from 'console';
 
 const MainLeft = ({
   isLoading,
@@ -86,16 +87,19 @@ const MainLeft = ({
           },
         ]);
       } else {
+        const respon = await res.json()
+        console.log(4444, respon);
         setFilesResponse((prev: any) => [
           ...prev,
           {
+            message: respon?.message,
             name: file.name,
             size: file.size,
             status: 'failed',
           },
         ]);
       }
-    });
+    })
   };
 
   const handleSend = async () => {
