@@ -174,10 +174,11 @@ const MainLeft = ({
                   checked={isCompressed}
                   onChange={() => setIsCompressed(!isCompressed)}
                   className="mr-2"
+                  disabled={isLoading}
                 />
                 <label
                   className="cursor-pointer"
-                  onClick={() => setIsCompressed(!isCompressed)}
+                  onClick={isLoading ? () => { } : () => setIsCompressed(!isCompressed)}
                 >
                   Compressed?
                 </label>
