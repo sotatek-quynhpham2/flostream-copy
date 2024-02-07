@@ -86,52 +86,43 @@ const MainRight = ({
             24 hours.
           </div>
           <div className="mt-5 max-h-[500px] overflow-auto flex flex-col gap-3">
-            <table className="table-auto">
-              <tbody>
-                {filesResponse.map((file: any) => {
-                  if (file.status === 'success') return <>
-                    <tr
-                      key={file.name}
-                      className="w-full text-[20px] font-medium leading-normal justify-between"
-                    >
-                      <td className="text-primary">
-                        {file.name}
-                      </td>
-                      <td className="text-neutral-2 whitespace-nowrap px-2 py-3">
-                        {bytesToSize(file.size)}
-                      </td>
-                      <td className="min-w-[24px]">
-                        <Image
-                          src={CopyIcon}
-                          height={24}
-                          alt="CopyIcon"
-                          className="cursor-pointer"
-                          onClick={() => shareFile(file)}
-                        />
-                      </td>
-                    </tr>
-                  </>
 
-                  return <>
-                    <tr
-                      key={file.name}
-                      className="w-full text-[20px] font-medium leading-normal justify-between"
-                    >
-                      <td className="text-primary">
-                        {file.name}
-                      </td>
-                      <td className="text-neutral-2 whitespace-nowrap px-2 py-3">
-                        {bytesToSize(file.size)}
-                      </td>
-                    </tr>
-                    <div className='flex'>
-                      <div className='text-[14px] font-[500] leading-[21px] text-[#FF613A] text-nowrap'>Failed to upload. </div>
-                      {/* <div className='text-[14px] font-[400] leading-[21px] tracking-[2%] text-[#FF613A] pl-[0.2rem]'>{ file?.message }</div> */}
-                    </div>
-                  </>
-                })}
-              </tbody>
-            </table>
+            {filesResponse.map((file: any) => (
+              <div
+                key={file.name}
+                className="w-full text-[20px] font-medium leading-normal justify-between"
+              >
+                <div className="w-full text-[20px] font-medium leading-normal justify-between flex mb-4">
+                  <p className="text-primary whitespace-nowrap text-ellipsis overflow-hidden">
+                    {file.name}
+                  </p>
+                  <p className="text-neutral-2 whitespace-nowrap text-ellipsis">
+                    {bytesToSize(file.size)}
+                  </p>
+                </div>
+
+                <div className="w-full text-[20px] font-medium leading-normal justify-between flex border border-neutral-4 rounded-lg">
+                  <div
+                    className="px-[16px] py-2 text-neutral-1 text-[16px] font-normal leading-normal cursor-pointer truncate"
+                    onClick={() => shareFile(file)}
+                  >
+                    {file.linkPreUrl ? file.linkPreUrl : 'Click to copy link'}
+                  </div>
+                  <p className="min-w-[48px] py-2 px-2 border-l-[1px] flex justify-center" id="copied">
+                    <Image
+                      src={CopyIcon}
+                      height={24}
+                      alt="CopyIcon"
+                      className="cursor-pointer"
+                      onClick={() => shareFile(file)}
+                    />
+                  </p>
+                  <Tooltip ref={tooltipRef1} />
+
+                </div>
+              </div>
+            ))}
+
           </div>
         </>
       )}
