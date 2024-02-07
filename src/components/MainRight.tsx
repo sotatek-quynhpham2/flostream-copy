@@ -6,7 +6,12 @@ import CopyIcon from '@/assets/icons/copy.svg';
 import { bytesToSize } from '@/utils';
 import { toast } from 'react-toastify';
 
-const MainRight = ({ isLoading, totalFiles, filesResponse }: any) => {
+const MainRight = ({
+  isLoading,
+  setIsLoading,
+  totalFiles,
+  filesResponse,
+}: any) => {
   const [percent, setPercent] = useState<number>(0);
 
   const shareFile = async (file: any) => {
@@ -43,14 +48,64 @@ const MainRight = ({ isLoading, totalFiles, filesResponse }: any) => {
       const newPercent = ((filesResponse.length / totalFiles) * 100).toFixed(0);
       setPercent(Number(newPercent));
     }
-  }, [filesResponse]);
+    if (filesResponse.length === totalFiles) {
+      setIsLoading(false);
+    }
+  }, [filesResponse.length]);
   return (
     <div
       className={`h-full bg-white rounded-xl md:rounded-l-[0px] p-6 md:px-[60px] md:py-[50px] max-md:mt-4
-      ${!isLoading && 'max-md:hidden'}
+      ${!isLoading && !filesResponse && 'max-md:hidden'}
     `}
     >
-      {isLoading && filesResponse.length === 0 && (
+      {filesResponse.length !== 0 && (
+        <>
+          <div className="text-neutral-1 text-[18px] font-bold leading-normal uppercase">
+            Files
+          </div>
+          <div className="mt-3 w-full bg-gray-200 rounded-full dark:bg-gray-700">
+            <div
+              className="bg-[#1990ff] text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
+              style={{ width: `${percent}%` }}
+            >
+              {percent}%
+            </div>
+          </div>
+          <div className="mt-2 text-neutral-2 text-[14px] font-normal leading-normal">
+            <strong>Copy link to share. </strong>Your file will be available for
+            24 hours.
+          </div>
+          <div className="mt-5 max-h-[500px] overflow-auto flex flex-col gap-3">
+            <table className="table-auto">
+              <tbody>
+                {filesResponse.map((file: any) => (
+                  <tr
+                    key={file.name}
+                    className="w-full text-[20px] font-medium leading-normal justify-between"
+                  >
+                    <td className="text-primary">
+                      {file.name}
+                    </td>
+                    <td className="text-neutral-2 whitespace-nowrap px-2 py-3">
+                      {bytesToSize(file.size)}
+                    </td>
+                    <td className="min-w-[24px]">
+                      <Image
+                        src={CopyIcon}
+                        height={24}
+                        alt="CopyIcon"
+                        className="cursor-pointer"
+                        onClick={() => shareFile(file)}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </>
+      )}
+      {isLoading && (
         <div className="flex justify-center items-center h-full flex-col gap-2 text-center">
           <Image
             src={LoadingIcon}
@@ -65,47 +120,6 @@ const MainRight = ({ isLoading, totalFiles, filesResponse }: any) => {
             Your file(s) are being uploaded.
           </div>
         </div>
-      )}
-      {filesResponse.length !== 0 && (
-        <>
-          <div className="text-neutral-1 text-[18px] font-bold leading-normal uppercase">
-            Files
-          </div>
-
-          <div className="mt-3 w-full bg-gray-200 rounded-full dark:bg-gray-700">
-            <div
-              className="bg-[#1990ff] text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full"
-              style={{ width: `${percent}%` }}
-            >
-              {percent}%
-            </div>
-          </div>
-          <div className="mt-2 text-neutral-2 text-[14px] font-normal leading-normal">
-            <strong>Copy link to share. </strong>Your file will be available for
-            24 hours.
-          </div>
-          <div className="mt-5 flex flex-col gap-3">
-            {filesResponse.map((file: any) => (
-              <div key={file.name} className="mt-3 flex gap-[10px] text-[20px] font-medium leading-normal justify-between">
-                <span className="text-primary whitespace-nowrap overflow-hidden text-ellipsis">
-                  {file.name}
-                </span>
-                <div className="flex gap-3">
-                  <span className="text-neutral-2 whitespace-nowrap">
-                    {bytesToSize(file.size)}
-                  </span>
-                  <Image
-                    src={CopyIcon}
-                    height={24}
-                    alt="CopyIcon"
-                    className="cursor-pointer"
-                    onClick={() => shareFile(file)}
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        </>
       )}
     </div>
   );

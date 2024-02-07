@@ -30,7 +30,7 @@ function App({ Component, pageProps }: AppProps) {
         contextClass[context?.type || "default"] +
         " no-progress-bar relative flex p-1 min-h-10 rounded-md justify-between overflow-hidden cursor-pointer"
       }
-        autoClose={300000}
+        autoClose={3000}
       />
     </AuthContext.Provider>
   );
