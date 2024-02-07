@@ -83,8 +83,10 @@ const MainLeft = ({
             name: file.name,
             size: file.size,
             status: 'success',
+            linkPreUrl: ''
           },
         ]);
+
       } else {
         setFilesResponse((prev: any) => [
           ...prev,
@@ -92,6 +94,7 @@ const MainLeft = ({
             name: file.name,
             size: file.size,
             status: 'failed',
+            linkPreUrl: ''
           },
         ]);
       }
@@ -134,6 +137,9 @@ const MainLeft = ({
     if (inputFile) {
       inputFile.value = '';
     }
+
+    handleReset()
+
   };
 
   return (
@@ -174,10 +180,11 @@ const MainLeft = ({
                   checked={isCompressed}
                   onChange={() => setIsCompressed(!isCompressed)}
                   className="mr-2"
+                  disabled={isLoading}
                 />
                 <label
                   className="cursor-pointer"
-                  onClick={() => setIsCompressed(!isCompressed)}
+                  onClick={isLoading ? () => { } : () => setIsCompressed(!isCompressed)}
                 >
                   Compressed?
                 </label>
@@ -196,6 +203,11 @@ const MainLeft = ({
           {isCompressed && (
             <div className="text-neutral-2 text-[16px] font-normal leading-normal">
               Your file(s) will be compressed into a zip file.
+            </div>
+          )}
+          {!isCompressed && (
+            <div className="text-neutral-2 text-[16px] font-normal leading-normal">
+              Your file(s) will be uploaded separately.
             </div>
           )}
 

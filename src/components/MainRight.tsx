@@ -1,10 +1,12 @@
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import LoadingIcon from '@/assets/icons/loading.svg';
 import CopyIcon from '@/assets/icons/copy.svg';
 import { bytesToSize } from '@/utils';
 import { toast } from 'react-toastify';
+import { Tooltip, TooltipRefProps } from 'react-tooltip'
+
 
 const MainRight = ({
   isLoading,
@@ -13,6 +15,7 @@ const MainRight = ({
   filesResponse,
 }: any) => {
   const [percent, setPercent] = useState<number>(0);
+  const tooltipRef1 = useRef<TooltipRefProps>(null)
 
   const shareFile = async (file: any) => {
     await fetch('/api/create-presigned-url', {
@@ -27,13 +30,25 @@ const MainRight = ({
             data
               .split(
                 process.env.NEXT_PUBLIC_STORE_ENDPOINT +
-                  `/${process.env.NEXT_PUBLIC_STORE_BUCKET}/`
+                `/${process.env.NEXT_PUBLIC_STORE_BUCKET}/`
               )
               .pop() + `&size=${file.size}`;
 
           const url = `${window.location.origin}/shared/${process.env.NEXT_PUBLIC_STORE_BUCKET}/${slug}`;
           navigator.clipboard.writeText(url);
           toast.success('Copied! The presigned url will expire in 24h');
+          tooltipRef1.current?.open({
+            anchorSelect: '#copied',
+            content: 'Link copied to clipboard!',
+            place: 'bottom'
+          })
+          filesResponse.filter((item: any) => {
+            if (item.name === file.name) {
+              item.linkPreUrl = url
+            }
+          })
+          console.log(file);
+
         });
       } else {
         res.json().then((data) => {
@@ -76,32 +91,43 @@ const MainRight = ({
             24 hours.
           </div>
           <div className="mt-5 max-h-[500px] overflow-auto flex flex-col gap-3">
-            <table className="table-auto">
-              <tbody>
-                {filesResponse.map((file: any) => (
-                  <tr
-                    key={file.name}
-                    className="w-full text-[20px] font-medium leading-normal justify-between"
+
+            {filesResponse.map((file: any) => (
+              <div
+                key={file.name}
+                className="w-full text-[20px] font-medium leading-normal justify-between"
+              >
+                <div className="w-full text-[20px] font-medium leading-normal justify-between flex mb-4">
+                  <p className="text-primary whitespace-nowrap text-ellipsis overflow-hidden">
+                    {file.name}
+                  </p>
+                  <p className="text-neutral-2 whitespace-nowrap text-ellipsis">
+                    {bytesToSize(file.size)}
+                  </p>
+                </div>
+
+                <div className="w-full text-[20px] font-medium leading-normal justify-between flex border border-neutral-4 rounded-lg">
+                  <div
+                    className="px-[16px] py-2 text-neutral-1 text-[16px] font-normal leading-normal cursor-pointer truncate"
+                    onClick={() => shareFile(file)}
                   >
-                    <td className="text-primary">
-                      {file.name}
-                    </td>
-                    <td className="text-neutral-2 whitespace-nowrap px-2 py-3">
-                      {bytesToSize(file.size)}
-                    </td>
-                    <td className="min-w-[24px]">
-                      <Image
-                        src={CopyIcon}
-                        height={24}
-                        alt="CopyIcon"
-                        className="cursor-pointer"
-                        onClick={() => shareFile(file)}
-                      />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+                    {file.linkPreUrl ? file.linkPreUrl : 'Click to copy link'}
+                  </div>
+                  <p className="min-w-[48px] py-2 px-2 border-l-[1px] flex justify-center" id="copied">
+                    <Image
+                      src={CopyIcon}
+                      height={24}
+                      alt="CopyIcon"
+                      className="cursor-pointer"
+                      onClick={() => shareFile(file)}
+                    />
+                  </p>
+                  <Tooltip ref={tooltipRef1} />
+
+                </div>
+              </div>
+            ))}
+
           </div>
         </>
       )}
