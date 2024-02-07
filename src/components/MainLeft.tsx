@@ -21,7 +21,6 @@ const MainLeft = ({
   const limitSize = new BigNumber(20).mul(1024).mul(1024).mul(1024).toString();
 
   const [isCompressed, setIsCompressed] = useState(false);
-
   const fileToBlob = async (file: File) => {
     const blob = await new Response(file).blob();
     return blob;
@@ -84,8 +83,10 @@ const MainLeft = ({
             name: file.name,
             size: file.size,
             status: 'success',
+            linkPreUrl: ''
           },
         ]);
+
       } else {
         const respon = await res.json()
         console.log(4444, respon);
@@ -96,6 +97,7 @@ const MainLeft = ({
             name: file.name,
             size: file.size,
             status: 'failed',
+            linkPreUrl: ''
           },
         ]);
       }
@@ -178,10 +180,11 @@ const MainLeft = ({
                   checked={isCompressed}
                   onChange={() => setIsCompressed(!isCompressed)}
                   className="mr-2"
+                  disabled={isLoading}
                 />
                 <label
                   className="cursor-pointer"
-                  onClick={() => setIsCompressed(!isCompressed)}
+                  onClick={isLoading ? () => { } : () => setIsCompressed(!isCompressed)}
                 >
                   Compressed?
                 </label>
@@ -200,6 +203,11 @@ const MainLeft = ({
           {isCompressed && (
             <div className="text-neutral-2 text-[16px] font-normal leading-normal">
               Your file(s) will be compressed into a zip file.
+            </div>
+          )}
+          {!isCompressed && (
+            <div className="text-neutral-2 text-[16px] font-normal leading-normal">
+              Your file(s) will be uploaded separately.
             </div>
           )}
 

@@ -1,10 +1,12 @@
 import { useRouter } from 'next/router';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Image from 'next/image';
 import LoadingIcon from '@/assets/icons/loading.svg';
 import CopyIcon from '@/assets/icons/copy.svg';
 import { bytesToSize } from '@/utils';
 import { toast } from 'react-toastify';
+import { Tooltip, TooltipRefProps } from 'react-tooltip'
+
 
 const MainRight = ({
   isLoading,
@@ -13,6 +15,7 @@ const MainRight = ({
   filesResponse,
 }: any) => {
   const [percent, setPercent] = useState<number>(0);
+  const tooltipRef1 = useRef<TooltipRefProps>(null)
 
   const shareFile = async (file: any) => {
     await fetch('/api/create-presigned-url', {
@@ -34,6 +37,13 @@ const MainRight = ({
           const url = `${window.location.origin}/shared/${process.env.NEXT_PUBLIC_STORE_BUCKET}/${slug}`;
           navigator.clipboard.writeText(url);
           toast.success('Copied! The presigned url will expire in 24h');
+          tooltipRef1.current?.open({
+            anchorSelect: '#copied',
+            content: 'Link copied to clipboard!',
+            place: 'bottom'
+          })
+          file.linkPreUrl = url
+
         });
       } else {
         res.json().then((data) => {
