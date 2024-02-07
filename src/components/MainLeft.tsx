@@ -20,7 +20,6 @@ const MainLeft = ({
   const limitSize = new BigNumber(20).mul(1024).mul(1024).mul(1024).toString();
 
   const [isCompressed, setIsCompressed] = useState(false);
-
   const fileToBlob = async (file: File) => {
     const blob = await new Response(file).blob();
     return blob;
@@ -137,9 +136,6 @@ const MainLeft = ({
     if (inputFile) {
       inputFile.value = '';
     }
-
-    handleReset()
-
   };
 
   return (

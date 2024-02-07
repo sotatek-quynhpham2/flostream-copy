@@ -42,12 +42,7 @@ const MainRight = ({
             content: 'Link copied to clipboard!',
             place: 'bottom'
           })
-          filesResponse.filter((item: any) => {
-            if (item.name === file.name) {
-              item.linkPreUrl = url
-            }
-          })
-          console.log(file);
+          file.linkPreUrl = url
 
         });
       } else {
