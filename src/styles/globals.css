@@ -51,10 +51,10 @@ body {
   background: #e0e0e4;
 }
 
-.no-progress-bar .Toastify__progress-bar {
+.Toastify__progress-bar {
   opacity: 0 !important;
 }
 
-.no-progress-bar .Toastify__close-button {
+.Toastify__close-button {
   display: none !important;
 }

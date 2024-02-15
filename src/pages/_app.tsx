@@ -28,7 +28,7 @@ function App({ Component, pageProps }: AppProps) {
       <Component {...pageProps} />
       <ToastContainer toastClassName={(context) =>
         contextClass[context?.type || "default"] +
-        " no-progress-bar relative flex p-1 min-h-10 rounded-md justify-between overflow-hidden cursor-pointer"
+        " relative flex p-1 mt-2 min-h-10 rounded-md justify-between overflow-hidden cursor-pointer"
       }
         autoClose={3000}
       />
