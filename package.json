@@ -20,6 +20,7 @@
     "formidable-serverless": "^1.1.1",
     "framer-motion": "^10.17.12",
     "fs": "^0.0.1-security",
+    "js-file-download": "^0.4.12",
     "jszip": "^3.10.1",
     "moment": "^2.30.1",
     "next": "14.0.4",
