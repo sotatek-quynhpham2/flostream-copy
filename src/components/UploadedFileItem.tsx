@@ -1,40 +1,54 @@
 import copyIcon from '@/assets/icons/copy-alt.svg'
 import FileItemIcon from '@/assets/icons/file-item.svg'
 import { bytesToSize, formatTimeUpload } from '@/utils'
-import { BatchItem, FILE_STATES, useItemStartListener } from '@rpldy/uploady'
+import { BatchItem, FILE_STATES, useItemFinishListener, useItemStartListener } from '@rpldy/uploady'
 import Image from 'next/image'
-import { useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 
 interface Props {
   fileItem: BatchItem
+  progressList: any
 }
 
-function UploadedFileItem({ fileItem }: Props) {
+function UploadedFileItem({ fileItem, progressList }: Props) {
   const timeStart = useRef(Date.now())
+  const previousValue = useRef<any>()
+  const [progress, setProgress] = useState<any>()
+
+  const progressSeverToS3 = useMemo(() => {
+    return progressList?.[fileItem.file.name]
+  }, [fileItem.file.name, progressList])
+
+  useEffect(() => {
+    if (progressSeverToS3?.percent < 100) {
+      setProgress(progressSeverToS3)
+    }
+  }, [progressSeverToS3])
 
   useItemStartListener((item) => {
     timeStart.current = Date.now()
   }, fileItem.id)
 
-  const progressUpload = useMemo(() => {
-    // if (![FILE_STATES.UPLOADING].includes(fileItem.state)) return '-'
-    return `${Math.round(fileItem.completed)} %`
+  useItemFinishListener(() => {
+    setProgress((prev: any) => ({ ...prev, percent: 100 }))
+  }, fileItem.id)
+
+  const progressUploadToServer = useMemo(() => {
+    return `${Math.round(fileItem.completed / 2)}`
   }, [fileItem])
 
-  const uploadSpeed = useMemo(() => {
-    // if (![FILE_STATES.UPLOADING].includes(fileItem.state)) return '-'
+  const uploadSpeedToServer = useMemo(() => {
     const time = (Date.now() - timeStart.current) / 1000
     const dataLoaded = fileItem.loaded / (1024 * 1024)
     return `${(dataLoaded / time).toFixed(2)}MB/s`
   }, [fileItem])
 
-  const uploadTime = useMemo(() => {
-    // if (![FILE_STATES.UPLOADING].includes(fileItem.state)) return '-'
+  const uploadTimeToServer = useMemo(() => {
     const time = (Date.now() - timeStart.current) / 1000
 
     const dataLoaded = fileItem.loaded
-    const fileSize = fileItem.file.size
+    const fileSize = fileItem.file.size * 2
 
     return formatTimeUpload((fileSize / dataLoaded) * time)
   }, [fileItem])
@@ -55,11 +69,6 @@ function UploadedFileItem({ fileItem }: Props) {
           const url = `${window.location.origin}/shared/${process.env.NEXT_PUBLIC_STORE_BUCKET}/${slug}`
           navigator.clipboard.writeText(url)
           toast.success('Copied! The presigned url will expire in 24h')
-          // tooltipRef1.current?.open({
-          //   anchorSelect: '#copied',
-          //   content: 'Link copied to clipboard!',
-          //   place: 'bottom'
-          // })
           file.linkPreUrl = url
         })
       } else {
@@ -80,7 +89,7 @@ function UploadedFileItem({ fileItem }: Props) {
         <div>
           <div className='bg-transparent rounded-full  border h-5px] border-primary w-4/5 '>
             <div
-              style={{ width: `${fileItem.completed}%` }}
+              style={{ width: `${progress?.percent || progressUploadToServer}%` }}
               className='bg-primary h-[3px] rounded-r-none rounded-full duration-500'
             ></div>
           </div>
@@ -92,15 +101,15 @@ function UploadedFileItem({ fileItem }: Props) {
           </div>
           <div className='flex-1 mr-2'>
             <div>Progress</div>
-            <div>{progressUpload}</div>
+            <div>{progress?.percent || progressUploadToServer} %</div>
           </div>
           <div className='flex-1 mr-2'>
             <div>Time</div>
-            <div>{uploadTime}</div>
+            <div>{progress?.totalTime || uploadTimeToServer}</div>
           </div>
           <div className='flex-1 mr-2'>
             <div>Rate</div>
-            <div>{uploadSpeed}</div>
+            <div>{progress?.speed || uploadSpeedToServer}</div>
           </div>
         </div>
       </div>

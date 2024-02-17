@@ -13,6 +13,7 @@
     "@aws-sdk/lib-storage": "^3.514.0",
     "@aws-sdk/s3-request-presigner": "^3.489.0",
     "@rpldy/chunked-uploady": "^1.7.1",
+    "@rpldy/sender": "^1.7.1",
     "@rpldy/upload-button": "^1.7.1",
     "@rpldy/uploady": "^1.7.1",
     "axios": "^1.6.4",
