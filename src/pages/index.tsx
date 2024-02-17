@@ -6,15 +6,10 @@ import { DefaultLayout as Layout } from '@/layouts/default'
 import ChunkedUploady, { BatchItem } from '@rpldy/chunked-uploady'
 import type { NextPage } from 'next'
 import { useEffect, useState } from 'react'
-import { useRequestPreSend } from '@rpldy/uploady'
 
 const HomePage: NextPage = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false)
-  const [totalFiles, setTotalFiles] = useState<number>(0)
-
-  const [filesResponse, setFilesResponse] = useState<any>([])
   const [isClient, setIsClient] = useState(false)
-
   const [fileList, setFileList] = useState<BatchItem[]>([])
 
   useEffect(() => {
@@ -40,13 +35,7 @@ const HomePage: NextPage = () => {
               setFileList={setFileList}
             />
 
-            <UploadInfo
-              isLoading={isLoading}
-              setIsLoading={setIsLoading}
-              totalFiles={totalFiles}
-              filesResponse={filesResponse}
-              fileList={fileList}
-            />
+            <UploadInfo isLoading={isLoading} fileList={fileList} />
           </div>
         </ChunkedUploady>
       )}
