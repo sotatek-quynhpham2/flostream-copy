@@ -17,8 +17,6 @@ function UploadedFileItem({ fileItem }: Props) {
     timeStart.current = Date.now()
   }, fileItem.id)
 
-  console.log(fileItem)
-
   const progressUpload = useMemo(() => {
     // if (![FILE_STATES.UPLOADING].includes(fileItem.state)) return '-'
     return `${Math.round(fileItem.completed)} %`
