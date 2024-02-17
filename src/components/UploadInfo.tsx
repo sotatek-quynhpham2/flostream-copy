@@ -4,6 +4,9 @@ import LoadingIcon from '@/assets/icons/loading.svg'
 import { BatchItem } from '@rpldy/uploady'
 import Image from 'next/image'
 import UploadedFileItem from './UploadedFileItem'
+import { useEffect, useState } from 'react'
+import axios from 'axios'
+import { Progress } from '@aws-sdk/lib-storage'
 
 interface Props {
   fileList: BatchItem[]
@@ -11,6 +14,16 @@ interface Props {
 }
 
 const UploadInfo = ({ isLoading, fileList }: Props) => {
+  const [progressList, setProgressList] = useState<any>([])
+
+  useEffect(() => {
+    setInterval(() => {
+      axios.get('/api/progress-upload-file').then((res) => {
+        setProgressList(res.data.data)
+      })
+    }, 1000)
+  }, [])
+
   return (
     <div
       className={`h-full bg-white rounded-xl md:rounded-l-[0px] p-6 md:px-[15px] md:py-[50px] max-md:mt-4
@@ -28,7 +41,7 @@ const UploadInfo = ({ isLoading, fileList }: Props) => {
 
       <div className=' rounded-xl px-5 py-4 flex flex-col gap-[10px] max-h-[700px] overflow-y-auto list-file'>
         {fileList.map((fileItem) => (
-          <UploadedFileItem key={fileItem.id} fileItem={fileItem} />
+          <UploadedFileItem progressList={progressList} key={fileItem.id} fileItem={fileItem} />
         ))}
       </div>
     </div>

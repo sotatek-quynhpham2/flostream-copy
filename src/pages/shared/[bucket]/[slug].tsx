@@ -115,16 +115,6 @@ const PreviewPage: NextPage = () => {
     } catch (error) {
       toast.error('failed to download file')
     }
-
-    // setIsLoading(true)
-    // const response = await fetch(s3AssetUrl)
-    // const blob = await response.blob()
-    // setIsLoading(false)
-    // const url = window.URL.createObjectURL(blob)
-    // const link = document.createElement('a')
-    // link.href = url
-    // link.download = slug ? slug.toString() : 'flostream'
-    // link.click()
   }
 
   return (

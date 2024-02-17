@@ -1,8 +1,10 @@
 import { S3Client } from '@aws-sdk/client-s3'
-import { Upload } from '@aws-sdk/lib-storage'
+import { Progress, Upload } from '@aws-sdk/lib-storage'
 import formidable from 'formidable-serverless'
 import * as fs from 'fs'
 import type { NextApiRequest, NextApiResponse } from 'next'
+
+export const progressUpload: { fileName: string; progress: Required<Progress>; timeStart: number }[] = []
 
 export const config = {
   api: {
@@ -44,24 +46,28 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
       const parallelUploads3 = new Upload({
         client: s3Client,
         params: { Bucket: process.env.NEXT_PUBLIC_STORE_BUCKET, Key: files.file.name, Body: rawData },
-
         tags: [
           /*...*/
         ], // optional tags
-        queueSize: 4, // optional concurrency configuration
-        partSize: 1024 * 1024 * 5, // optional size of each part, in bytes, at least 5MB
+        queueSize: 10, // optional concurrency configuration
+        partSize: 1024 * 1024 * 10, // optional size of each part, in bytes, at least 5MB
         leavePartsOnError: false // optional manually handle dropped parts
       })
 
-      // parallelUploads3.on('httpUploadProgress', (progress) => {
-      //   console.log(progress)
-      // })
+      parallelUploads3.on('httpUploadProgress', (progress) => {
+        const index = progressUpload.findIndex((x) => x.fileName === files.file.name)
+        if (index !== -1) {
+          progressUpload[index].progress = progress
+        } else {
+          progressUpload.push({ fileName: files.file.name, progress, timeStart: Date.now() })
+        }
+      })
 
       await parallelUploads3.done()
       res.status(200).json('done')
     } catch (e) {
+      console.log({ e })
       res.status(500).json(e)
-      console.log(e)
     }
 
     // await s3Client
