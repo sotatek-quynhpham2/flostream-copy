@@ -1,3 +1,5 @@
+'use client'
+
 import DotIcon from '@/assets/icons/dot.svg'
 import FilePlusIcon from '@/assets/icons/file-plus.svg'
 import ReloadIcon from '@/assets/icons/reload.svg'
@@ -78,10 +80,11 @@ const UploadForm = ({ fileList, setFileList, isLoading, setIsLoading }: UploadFo
   })
 
   useItemProgressListener((item) => {
+    // console.log(item)
     setFileList((list) => {
       const newList = [...list]
       const index = list.findIndex((x) => x.id === item.id)
-      newList[index] = item
+      newList[index] = { ...item }
       return newList
     })
   })
