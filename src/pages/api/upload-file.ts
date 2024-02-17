@@ -1,33 +1,30 @@
-import type { NextApiRequest, NextApiResponse } from 'next';
-import {
-  PutObjectCommand,
-  GetObjectCommand,
-  S3Client,
-} from '@aws-sdk/client-s3';
-import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
-import formidable from 'formidable-serverless';
-import * as fs from 'fs';
+import { S3Client } from '@aws-sdk/client-s3'
+import { Upload } from '@aws-sdk/lib-storage'
+import formidable from 'formidable-serverless'
+import * as fs from 'fs'
+import type { NextApiRequest, NextApiResponse } from 'next'
 
 export const config = {
   api: {
     bodyParser: false,
-  },
-};
+    externalResolver: true
+  }
+}
 
 async function POST(req: NextApiRequest, res: NextApiResponse) {
-  const accessKeyId = process.env.NEXT_PUBLIC_STORE_ACCESS_KEY_ID;
-  const secretAccessKey = process.env.NEXT_PUBLIC_STORE_SECRET_ACCESS_KEY;
+  const accessKeyId = process.env.NEXT_PUBLIC_STORE_ACCESS_KEY_ID
+  const secretAccessKey = process.env.NEXT_PUBLIC_STORE_SECRET_ACCESS_KEY
 
   let options = {
     maxFileSize: 20 * 1024 * 1024 * 1024, // 20 GB
-    allowEmptyFiles: false,
-  };
+    allowEmptyFiles: false
+  }
 
-  const form = new formidable.IncomingForm(options);
+  const form = new formidable.IncomingForm(options)
 
   form.parse(req, async (error: any, fields: any, files: any) => {
     if (error) {
-      throw error;
+      throw error
     }
 
     const s3Client = new S3Client({
@@ -36,29 +33,54 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
       forcePathStyle: true,
       credentials: {
         accessKeyId: accessKeyId as string,
-        secretAccessKey: secretAccessKey as string,
-      },
-    });
+        secretAccessKey: secretAccessKey as string
+      }
+    })
 
-    let path = files.file.path;
-    let rawData = fs.readFileSync(path);
+    let path = files.file.path
+    let rawData = fs.readFileSync(path)
 
-    await s3Client
-      .send(
-        new PutObjectCommand({
-          Bucket: process.env.NEXT_PUBLIC_STORE_BUCKET,
-          Key: files.file.name,
-          Body: rawData,
-          ContentType: files.file.type,
-        })
-      )
-      .then((response) => {
-        res.status(200).json(response);
+    try {
+      const parallelUploads3 = new Upload({
+        client: s3Client,
+        params: { Bucket: process.env.NEXT_PUBLIC_STORE_BUCKET, Key: files.file.name, Body: rawData },
+
+        tags: [
+          /*...*/
+        ], // optional tags
+        queueSize: 4, // optional concurrency configuration
+        partSize: 1024 * 1024 * 5, // optional size of each part, in bytes, at least 5MB
+        leavePartsOnError: false // optional manually handle dropped parts
       })
-      .catch((error) => {
-        res.status(500).json(error);
-      });
-  });
+
+      // parallelUploads3.on('httpUploadProgress', (progress) => {
+      //   console.log(progress)
+      // })
+
+      await parallelUploads3.done()
+      res.status(200).json('done')
+    } catch (e) {
+      res.status(500).json(e)
+      console.log(e)
+    }
+
+    // await s3Client
+    //   .send(
+    //     new PutObjectCommand({
+    //       Bucket: process.env.NEXT_PUBLIC_STORE_BUCKET,
+    //       Key: files.file.name,
+    //       Body: rawData,
+    //       ContentType: files.file.type,
+
+    //     })
+    //   )
+    //   .then((response) => {
+    //     res.status(200).json(response);
+    //   })
+    //   .catch((error) => {
+    //     res.status(500).json(error);
+    //   });
+  })
 }
 
-export default POST;
+export default POST
