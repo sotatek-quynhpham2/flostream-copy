@@ -1,3 +1,5 @@
+'use client'
+
 import UploadForm from '@/components/UploadForm'
 import UploadInfo from '@/components/UploadInfo'
 import { DefaultLayout as Layout } from '@/layouts/default'
@@ -28,7 +30,6 @@ const HomePage: NextPage = () => {
           maxConcurrent={10}
           autoUpload={true}
           multiple={true}
-          fastAbortThreshold={5}
           destination={{ url: '/api/upload-file' }}
         >
           <div className='mt-6 md:mt-9 w-full mx-auto xl:w-[1080px] md:min-h-[685px] grid grid-cols-1 md:grid-cols-2'>

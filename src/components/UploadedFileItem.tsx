@@ -17,20 +17,22 @@ function UploadedFileItem({ fileItem }: Props) {
     timeStart.current = Date.now()
   }, fileItem.id)
 
+  console.log(fileItem)
+
   const progressUpload = useMemo(() => {
-    if (![FILE_STATES.UPLOADING].includes(fileItem.state)) return '-'
+    // if (![FILE_STATES.UPLOADING].includes(fileItem.state)) return '-'
     return `${Math.round(fileItem.completed)} %`
   }, [fileItem])
 
   const uploadSpeed = useMemo(() => {
-    if (![FILE_STATES.UPLOADING].includes(fileItem.state)) return '-'
+    // if (![FILE_STATES.UPLOADING].includes(fileItem.state)) return '-'
     const time = (Date.now() - timeStart.current) / 1000
     const dataLoaded = fileItem.loaded / (1024 * 1024)
     return `${(dataLoaded / time).toFixed(2)}MB/s`
   }, [fileItem])
 
   const uploadTime = useMemo(() => {
-    if (![FILE_STATES.UPLOADING].includes(fileItem.state)) return '-'
+    // if (![FILE_STATES.UPLOADING].includes(fileItem.state)) return '-'
     const time = (Date.now() - timeStart.current) / 1000
 
     const dataLoaded = fileItem.loaded

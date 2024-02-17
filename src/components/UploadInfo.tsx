@@ -1,13 +1,11 @@
-import { useRouter } from 'next/router'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import Image from 'next/image'
+'use client'
+
 import LoadingIcon from '@/assets/icons/loading.svg'
-import CopyIcon from '@/assets/icons/copy.svg'
-import { bytesToSize } from '@/utils'
-import { toast } from 'react-toastify'
-import { Tooltip, TooltipRefProps } from 'react-tooltip'
-import UploadedFileItem from './UploadedFileItem'
 import { BatchItem, FILE_STATES } from '@rpldy/uploady'
+import Image from 'next/image'
+import { useMemo, useRef, useState } from 'react'
+import { TooltipRefProps } from 'react-tooltip'
+import UploadedFileItem from './UploadedFileItem'
 
 interface Props {
   fileList: BatchItem[]
@@ -17,10 +15,6 @@ interface Props {
 const UploadInfo = ({ isLoading, setIsLoading, totalFiles, filesResponse, fileList }: Props) => {
   const [percent, setPercent] = useState<number>(0)
   const tooltipRef1 = useRef<TooltipRefProps>(null)
-
-  const uploadingFileList = useMemo(() => {
-    return fileList.filter((item) => item.state === FILE_STATES.UPLOADING)
-  }, [fileList])
 
   return (
     <div
