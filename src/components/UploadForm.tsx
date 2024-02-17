@@ -48,7 +48,10 @@ const UploadForm = ({ fileList, setFileList, isLoading, setIsLoading }: UploadFo
           break
         }
         const id = uuidv4()
-        filesList.push({ id: uuidv4(), file: renameFile(file, `${file.name}-${id.slice(0, 10)}`) })
+        filesList.push({
+          id: uuidv4(),
+          file: renameFile(file, `${id.slice(0, 10)}-${file.name}`)
+        })
       }
       if (!valid) {
         return toast.error('file size must less than 20GB')
@@ -108,7 +111,7 @@ const UploadForm = ({ fileList, setFileList, isLoading, setIsLoading }: UploadFo
     const zip = new JSZip() // instance of JSZip
 
     fileRawList.forEach((file) => {
-      zip.file(`zip-file-${uuidv4().slice(0, 10)}`, file.file)
+      zip.file(file.file.name, file.file)
     })
 
     // Generate the zip file
@@ -117,7 +120,7 @@ const UploadForm = ({ fileList, setFileList, isLoading, setIsLoading }: UploadFo
       streamFiles: true
     })
 
-    return new File([zipData], `zip-file-${uuidv4().slice(0, 10)}`, {
+    return new File([zipData], `zip-file-${uuidv4().slice(0, 10)}.zip`, {
       type: 'application/zip'
     })
   }

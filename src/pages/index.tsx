@@ -3,7 +3,8 @@
 import UploadForm from '@/components/UploadForm'
 import UploadInfo from '@/components/UploadInfo'
 import { DefaultLayout as Layout } from '@/layouts/default'
-import ChunkedUploady, { BatchItem } from '@rpldy/chunked-uploady'
+// import ChunkedUploady, { BatchItem } from '@rpldy/chunked-uploady'
+import Uploady, { BatchItem } from '@rpldy/uploady'
 import type { NextPage } from 'next'
 import { useEffect, useState } from 'react'
 
@@ -19,9 +20,9 @@ const HomePage: NextPage = () => {
   return (
     <Layout>
       {isClient && (
-        <ChunkedUploady
+        <Uploady
           concurrent
-          parallel={10}
+          // parallel={10}
           maxConcurrent={10}
           autoUpload={true}
           multiple={true}
@@ -37,7 +38,7 @@ const HomePage: NextPage = () => {
 
             <UploadInfo isLoading={isLoading} fileList={fileList} />
           </div>
-        </ChunkedUploady>
+        </Uploady>
       )}
     </Layout>
   )

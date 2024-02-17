@@ -156,13 +156,15 @@ const PreviewPage: NextPage = () => {
               <div className='text-neutral-2 text-[14px] font-normal leading-normal'>No preview available</div>
             )}
 
-            <button
+            <a
               className='bg-primary text-white rounded-[10px] py-2 px-6 text-[16px] font-medium flex justify-center items-center gap-2'
-              onClick={() => downloadFile()}
+              href={s3AssetUrl}
+              download={slug || 'file'}
+              // onClick={() => downloadFile()}
             >
               <Image src={DownloadIcon} alt='Download' height={16} />
               Download
-            </button>
+            </a>
           </>
         )}
         {isLoading && (
