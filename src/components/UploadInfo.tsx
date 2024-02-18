@@ -17,11 +17,15 @@ const UploadInfo = ({ isLoading, fileList }: Props) => {
   const [progressList, setProgressList] = useState<any>([])
 
   useEffect(() => {
-    setInterval(() => {
+    const intervalRef = setInterval(() => {
       axios.get('/api/progress-upload-file').then((res) => {
         setProgressList(res.data.data)
       })
     }, 1000)
+
+    return () => {
+      clearInterval(intervalRef)
+    }
   }, [])
 
   return (

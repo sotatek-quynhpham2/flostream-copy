@@ -57,9 +57,17 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
       parallelUploads3.on('httpUploadProgress', (progress) => {
         const index = progressUpload.findIndex((x) => x.fileName === files.file.name)
         if (index !== -1) {
-          progressUpload[index].progress = progress
+          if (progress.loaded === progress.total) {
+            progressUpload.splice(index, 1)
+          } else {
+            progressUpload[index].progress = progress as Required<Progress>
+          }
         } else {
-          progressUpload.push({ fileName: files.file.name, progress, timeStart: Date.now() })
+          progressUpload.push({
+            fileName: files.file.name,
+            progress: progress as Required<Progress>,
+            timeStart: Date.now()
+          })
         }
       })
 
