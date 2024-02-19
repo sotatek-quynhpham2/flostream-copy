@@ -1,10 +1,10 @@
 'use client'
 
 import LoadingIcon from '@/assets/icons/loading.svg'
-import { BatchItem } from '@rpldy/uploady'
+import { BatchItem, FILE_STATES } from '@rpldy/uploady'
 import Image from 'next/image'
 import UploadedFileItem from './UploadedFileItem'
-import { useEffect, useState } from 'react'
+import { use, useEffect, useMemo, useRef, useState } from 'react'
 import axios from 'axios'
 import { Progress } from '@aws-sdk/lib-storage'
 
@@ -15,18 +15,32 @@ interface Props {
 
 const UploadInfo = ({ isLoading, fileList }: Props) => {
   const [progressList, setProgressList] = useState<any>([])
+  const intervalRef = useRef<any>()
+
+  const isFinished = useMemo(() => fileList.every((item) => item.state === FILE_STATES.FINISHED), [fileList])
+  const startInterval = useMemo(() => fileList.some((x) => x.state === FILE_STATES.UPLOADING), [fileList])
 
   useEffect(() => {
-    const intervalRef = setInterval(() => {
-      axios.get('/api/progress-upload-file').then((res) => {
-        setProgressList(res.data.data)
-      })
-    }, 1000)
+    if (startInterval) {
+      intervalRef.current = setInterval(() => {
+        axios.get('/api/progress-upload-file').then((res) => {
+          setProgressList(res.data.data)
+        })
+      }, 1000)
+    }
 
     return () => {
-      clearInterval(intervalRef)
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+      }
     }
-  }, [])
+  }, [startInterval])
+
+  useEffect(() => {
+    if (isFinished) {
+      clearInterval(intervalRef.current)
+    }
+  }, [isFinished])
 
   return (
     <div
