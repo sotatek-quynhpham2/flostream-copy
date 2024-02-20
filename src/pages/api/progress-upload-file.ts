@@ -1,10 +1,11 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { progressUpload } from './upload-file'
 import { formatTimeUpload } from '@/utils'
+import type { NextApiRequest, NextApiResponse } from 'next'
+import { getProgress } from './upload-file'
 
 async function GET(req: NextApiRequest, res: NextApiResponse) {
   const data: any = {}
-  progressUpload.forEach((progress) => {
+
+  getProgress().forEach((progress) => {
     const percent = Math.round(
       ((progress?.progress?.loaded + progress?.progress?.total) / (progress?.progress?.total * 2)) * 100
     )

@@ -17,10 +17,12 @@ const UploadInfo = ({ isLoading, fileList }: Props) => {
   const intervalRef = useRef<any>()
 
   const isFinished = useMemo(() => fileList.every((item) => item.state === FILE_STATES.FINISHED), [fileList])
-  const startInterval = useMemo(() => fileList.some((x) => x.completed === 100), [fileList])
+  const startInterval = useMemo(() => fileList.some((x) => x.completed > 80), [fileList])
+
+  console.log(fileList)
 
   useEffect(() => {
-    if (startInterval) {
+    if (startInterval && !intervalRef.current) {
       intervalRef.current = setInterval(() => {
         axios.get('/api/progress-upload-file').then((res) => {
           setProgressList(res.data.data)
