@@ -19,8 +19,6 @@ const UploadInfo = ({ isLoading, fileList }: Props) => {
   const isFinished = useMemo(() => fileList.every((item) => item.state === FILE_STATES.FINISHED), [fileList])
   const startInterval = useMemo(() => fileList.some((x) => x.completed > 80), [fileList])
 
-  console.log(fileList)
-
   useEffect(() => {
     if (startInterval && !intervalRef.current) {
       intervalRef.current = setInterval(() => {

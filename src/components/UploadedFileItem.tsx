@@ -3,10 +3,10 @@ import FileItemIcon from '@/assets/icons/file-item.svg'
 import { bytesToSize, formatTimeUpload } from '@/utils'
 import { BatchItem, FILE_STATES, useItemFinishListener, useItemStartListener } from '@rpldy/uploady'
 import axios from 'axios'
+import copy from 'copy-to-clipboard'
 import Image from 'next/image'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
-import copy from 'copy-to-clipboard'
 
 interface Props {
   fileItem: BatchItem
@@ -15,7 +15,6 @@ interface Props {
 
 function UploadedFileItem({ fileItem, progressList }: Props) {
   const timeStart = useRef(Date.now())
-  const previousValue = useRef<any>()
   const [progress, setProgress] = useState<any>()
 
   const progressSeverToS3 = useMemo(() => {
@@ -32,18 +31,26 @@ function UploadedFileItem({ fileItem, progressList }: Props) {
     timeStart.current = Date.now()
   }, fileItem.id)
 
+  const uploadSpeedToServer = useMemo(() => {
+    const time = (Date.now() - timeStart.current) / 1000
+    const dataLoaded = fileItem.loaded / (1024 * 1024)
+    return dataLoaded / time
+  }, [fileItem])
+
   useItemFinishListener(() => {
-    setProgress((prev: any) => ({ ...prev, percent: 100 }))
+    const total = fileItem.total / (1024 * 1024)
+    const totalTimeToServer = total / uploadSpeedToServer
+    const totalTimeServerToS3 = total / progress?.speed || 0
+
+    setProgress((prev: any) => ({
+      ...prev,
+      percent: 100,
+      totalTime: formatTimeUpload(totalTimeToServer + totalTimeServerToS3)
+    }))
   }, fileItem.id)
 
   const progressUploadToServer = useMemo(() => {
     return `${Math.round(fileItem.completed / 2)}`
-  }, [fileItem])
-
-  const uploadSpeedToServer = useMemo(() => {
-    const time = (Date.now() - timeStart.current) / 1000
-    const dataLoaded = fileItem.loaded / (1024 * 1024)
-    return `${(dataLoaded / time).toFixed(2)}MB/s`
   }, [fileItem])
 
   const uploadTimeToServer = useMemo(() => {
@@ -123,7 +130,7 @@ function UploadedFileItem({ fileItem, progressList }: Props) {
           </div>
           <div className='flex-1 mr-2'>
             <div>Rate</div>
-            <div>{progress?.speed || uploadSpeedToServer}</div>
+            <div>{progress?.speed?.toFixed(2) || uploadSpeedToServer?.toFixed(2)}MB/s</div>
           </div>
         </div>
       </div>
