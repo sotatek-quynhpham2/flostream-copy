@@ -11,7 +11,7 @@ async function GET(req: NextApiRequest, res: NextApiResponse) {
     )
     const time = (Date.now() - progress.timeStart) / 1000
     const dataLoaded = progress.progress.loaded / (1024 * 1024)
-    const speed = `${(dataLoaded / time).toFixed(2)}MB/s`
+    const speed = dataLoaded / time
     const totalTime = formatTimeUpload((progress.progress.total / progress.progress.loaded) * time)
 
     data[progress.fileName] = {
