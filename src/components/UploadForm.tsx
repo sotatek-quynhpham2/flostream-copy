@@ -8,7 +8,6 @@ import TrashIcon from '@/assets/icons/trash.svg'
 import { bytesToSize, renameFile } from '@/utils'
 import {
   BatchItem,
-  FILE_STATES,
   useBatchAddListener,
   useItemAbortListener,
   useItemFinishListener,
@@ -21,7 +20,6 @@ import Image from 'next/image'
 import { ChangeEvent, Dispatch, SetStateAction, useMemo, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 import { v4 as uuidv4 } from 'uuid'
-import { Upload } from '@aws-sdk/lib-storage'
 
 interface UploadFormProps {
   fileList: BatchItem[]
@@ -84,7 +82,6 @@ const UploadForm = ({ fileList, setFileList, isLoading, setIsLoading }: UploadFo
   })
 
   useItemProgressListener((item) => {
-    // console.log(item)
     setFileList((list) => {
       const newList = [...list]
       const index = list.findIndex((x) => x.id === item.id)

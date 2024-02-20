@@ -2,11 +2,10 @@
 
 import LoadingIcon from '@/assets/icons/loading.svg'
 import { BatchItem, FILE_STATES } from '@rpldy/uploady'
-import Image from 'next/image'
-import UploadedFileItem from './UploadedFileItem'
-import { use, useEffect, useMemo, useRef, useState } from 'react'
 import axios from 'axios'
-import { Progress } from '@aws-sdk/lib-storage'
+import Image from 'next/image'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import UploadedFileItem from './UploadedFileItem'
 
 interface Props {
   fileList: BatchItem[]
@@ -18,7 +17,7 @@ const UploadInfo = ({ isLoading, fileList }: Props) => {
   const intervalRef = useRef<any>()
 
   const isFinished = useMemo(() => fileList.every((item) => item.state === FILE_STATES.FINISHED), [fileList])
-  const startInterval = useMemo(() => fileList.some((x) => x.state === FILE_STATES.UPLOADING), [fileList])
+  const startInterval = useMemo(() => fileList.some((x) => x.completed === 100), [fileList])
 
   useEffect(() => {
     if (startInterval) {

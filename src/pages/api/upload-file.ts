@@ -1,10 +1,39 @@
-import { S3Client } from '@aws-sdk/client-s3'
-import { Progress, Upload } from '@aws-sdk/lib-storage'
+import { S3 } from 'aws-sdk'
 import formidable from 'formidable-serverless'
 import * as fs from 'fs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-export const progressUpload: { fileName: string; progress: Required<Progress>; timeStart: number }[] = []
+export const progressUpload: {
+  fileName: string
+  timeStart: number
+  progress: {
+    total: number
+    loaded: number
+  }
+}[] = []
+
+function splitFile(filePath: string, chunkSize: number): Promise<Buffer[]> {
+  return new Promise((resolve, reject) => {
+    const chunks: Buffer[] = []
+    let bytesRead = 0
+
+    const readStream = fs.createReadStream(filePath, { highWaterMark: chunkSize })
+
+    readStream.on('data', (chunk: Buffer) => {
+      chunks.push(chunk)
+      bytesRead += chunk.length
+    })
+
+    readStream.on('end', () => {
+      console.log(`File split into ${chunks.length} chunks`)
+      resolve(chunks)
+    })
+
+    readStream.on('error', (err) => {
+      reject(err)
+    })
+  })
+}
 
 export const config = {
   api: {
@@ -16,12 +45,26 @@ export const config = {
 async function POST(req: NextApiRequest, res: NextApiResponse) {
   const accessKeyId = process.env.NEXT_PUBLIC_STORE_ACCESS_KEY_ID
   const secretAccessKey = process.env.NEXT_PUBLIC_STORE_SECRET_ACCESS_KEY
+  const region = process.env.NEXT_PUBLIC_STORE_REGION
+  const endPoint = process.env.NEXT_PUBLIC_STORE_ENDPOINT
+  const bucketName = process.env.NEXT_PUBLIC_STORE_BUCKET
+
+  const s3 = new S3({
+    endpoint: endPoint,
+    s3ForcePathStyle: true,
+    region: region,
+    credentials: {
+      accessKeyId: accessKeyId as string,
+      secretAccessKey: secretAccessKey as string
+    }
+  })
 
   let options = {
     maxFileSize: 20 * 1024 * 1024 * 1024, // 20 GB
     allowEmptyFiles: false
   }
 
+  const CHUNK_SIZE = 10 * 1024 * 1024 // 10MB
   const form = new formidable.IncomingForm(options)
 
   form.parse(req, async (error: any, fields: any, files: any) => {
@@ -29,71 +72,76 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
       throw error
     }
 
-    const s3Client = new S3Client({
-      endpoint: process.env.NEXT_PUBLIC_STORE_ENDPOINT,
-      region: process.env.NEXT_PUBLIC_STORE_REGION,
-      forcePathStyle: true,
-      credentials: {
-        accessKeyId: accessKeyId as string,
-        secretAccessKey: secretAccessKey as string
-      }
-    })
-
-    let path = files.file.path
-    let rawData = fs.readFileSync(path)
-
-    try {
-      const parallelUploads3 = new Upload({
-        client: s3Client,
-        params: { Bucket: process.env.NEXT_PUBLIC_STORE_BUCKET, Key: files.file.name, Body: rawData },
-        tags: [
-          /*...*/
-        ], // optional tags
-        queueSize: 10, // optional concurrency configuration
-        partSize: 1024 * 1024 * 10, // optional size of each part, in bytes, at least 5MB
-        leavePartsOnError: false // optional manually handle dropped parts
-      })
-
-      parallelUploads3.on('httpUploadProgress', (progress) => {
-        const index = progressUpload.findIndex((x) => x.fileName === files.file.name)
-        if (index !== -1) {
-          if (progress.loaded === progress.total) {
-            progressUpload.splice(index, 1)
-          } else {
-            progressUpload[index].progress = progress as Required<Progress>
+    const createUploadId = () =>
+      new Promise<S3.CreateMultipartUploadOutput>((rel, rej) => {
+        s3.createMultipartUpload(
+          {
+            Bucket: bucketName as string,
+            Key: files.file.name,
+            ContentType: files.file.type
+          },
+          (err, res) => {
+            if (err) rej(err)
+            rel(res)
           }
-        } else {
-          progressUpload.push({
-            fileName: files.file.name,
-            progress: progress as Required<Progress>,
-            timeStart: Date.now()
-          })
-        }
+        )
       })
 
-      await parallelUploads3.done()
-      res.status(200).json('done')
-    } catch (e) {
-      console.log({ e })
-      res.status(500).json(e)
-    }
+    const { UploadId } = await createUploadId()
 
-    // await s3Client
-    //   .send(
-    //     new PutObjectCommand({
-    //       Bucket: process.env.NEXT_PUBLIC_STORE_BUCKET,
-    //       Key: files.file.name,
-    //       Body: rawData,
-    //       ContentType: files.file.type,
+    splitFile(files.file.path, CHUNK_SIZE)
+      .then(async (chunks: Buffer[]) => {
+        const promises = chunks.map(async (chunk: Buffer, index: number) => {
+          const partNumber = index + 1
+          const params: AWS.S3.UploadPartRequest = {
+            Body: chunk,
+            Bucket: bucketName as string,
+            Key: files.file.name,
+            PartNumber: partNumber,
+            UploadId: UploadId as string
+          }
 
-    //     })
-    //   )
-    //   .then((response) => {
-    //     res.status(200).json(response);
-    //   })
-    //   .catch((error) => {
-    //     res.status(500).json(error);
-    //   });
+          // Upload the part
+          const data = await s3.uploadPart(params).promise()
+          const indexExist = progressUpload.findIndex((x: any) => x.fileName === files.file.name)
+          if (indexExist !== -1) {
+            let indexMax = 1
+            if (indexMax < index) {
+              indexMax = index
+            }
+            progressUpload[indexExist].progress = {
+              loaded: 10 * 1024 * 1024 * (indexMax + 1),
+              total: files.file.size
+            }
+          } else {
+            progressUpload.push({
+              fileName: files.file.name,
+              timeStart: Date.now(),
+              progress: { loaded: 10 * 1024 * 1024, total: files.file.size }
+            })
+          }
+
+          return { PartNumber: partNumber, ETag: data.ETag }
+        })
+
+        // Wait for all parts to be uploaded
+        const parts = await Promise.all(promises)
+
+        // Complete the multipart upload
+        await s3
+          .completeMultipartUpload({
+            Bucket: bucketName as string,
+            Key: files.file.name as string,
+            UploadId: UploadId as string,
+            MultipartUpload: { Parts: parts }
+          })
+          .promise()
+
+        return res.status(200).json({ msg: 'upload file successfully' })
+      })
+      .catch((err) => {
+        res.status(500).json({ err })
+      })
   })
 }
 
