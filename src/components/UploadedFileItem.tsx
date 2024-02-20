@@ -2,9 +2,11 @@ import copyIcon from '@/assets/icons/copy-alt.svg'
 import FileItemIcon from '@/assets/icons/file-item.svg'
 import { bytesToSize, formatTimeUpload } from '@/utils'
 import { BatchItem, FILE_STATES, useItemFinishListener, useItemStartListener } from '@rpldy/uploady'
+import axios from 'axios'
 import Image from 'next/image'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
+import copy from 'copy-to-clipboard'
 
 interface Props {
   fileItem: BatchItem
@@ -54,29 +56,41 @@ function UploadedFileItem({ fileItem, progressList }: Props) {
   }, [fileItem])
 
   const shareFile = async (file: any) => {
-    await fetch('/api/create-presigned-url', {
-      method: 'POST',
-      body: JSON.stringify({
-        objectKey: file.name
-      })
-    }).then((res) => {
-      if (res.ok) {
-        res.json().then((data) => {
-          const slug =
-            data.split(process.env.NEXT_PUBLIC_STORE_ENDPOINT + `/${process.env.NEXT_PUBLIC_STORE_BUCKET}/`).pop() +
-            `&size=${file.size}`
+    try {
+      const res = await axios.post('/api/create-presigned-url', { objectKey: file.name })
 
-          const url = `${window.location.origin}/shared/${process.env.NEXT_PUBLIC_STORE_BUCKET}/${slug}`
-          navigator.clipboard.writeText(url)
-          toast.success('Copied! The presigned url will expire in 24h')
-          file.linkPreUrl = url
-        })
-      } else {
-        res.json().then((data) => {
-          toast.error(data.message)
-        })
-      }
-    })
+      const slug =
+        res.data.split(process.env.NEXT_PUBLIC_STORE_ENDPOINT + `/${process.env.NEXT_PUBLIC_STORE_BUCKET}/`).pop() +
+        `&size=${file.size}`
+      const url = `${window.location.origin}/shared/${process.env.NEXT_PUBLIC_STORE_BUCKET}/${slug}`
+      copy(url)
+      toast.success('Copied! The presigned url will expire in 24h')
+      file.linkPreUrl = url
+    } catch (error) {}
+
+    // await fetch('/api/create-presigned-url', {
+    //   method: 'POST',
+    //   body: JSON.stringify({
+    //     objectKey: file.name
+    //   })
+    // }).then((res) => {
+    //   if (res.ok) {
+    //     res.json().then((data) => {
+    //       const slug =
+    //         data.split(process.env.NEXT_PUBLIC_STORE_ENDPOINT + `/${process.env.NEXT_PUBLIC_STORE_BUCKET}/`).pop() +
+    //         `&size=${file.size}`
+
+    //       const url = `${window.location.origin}/shared/${process.env.NEXT_PUBLIC_STORE_BUCKET}/${slug}`
+    //       navigator.clipboard.writeText(url)
+    //       toast.success('Copied! The presigned url will expire in 24h')
+    //       file.linkPreUrl = url
+    //     })
+    //   } else {
+    //     res.json().then((data) => {
+    //       toast.error(data.message)
+    //     })
+    //   }
+    // })
   }
 
   return (

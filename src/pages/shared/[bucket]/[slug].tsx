@@ -1,29 +1,27 @@
+import { DefaultLayout as Layout } from '@/layouts/default'
+import { bytesToSize } from '@/utils'
+import moment from 'moment'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState } from 'react'
-import { DefaultLayout as Layout } from '@/layouts/default'
-import moment from 'moment'
+import { useEffect, useState } from 'react'
 import { toast } from 'react-toastify'
-import { bytesToSize } from '@/utils'
 
-import Image from 'next/image'
 import AudioIcon from '@/assets/icons/audio.png'
+import DataExpiredIcon from '@/assets/icons/data-expired.png'
 import DocxIcon from '@/assets/icons/docx.svg'
+import DownloadIcon from '@/assets/icons/download.svg'
 import ImageIcon from '@/assets/icons/image.png'
+import LoadingIcon from '@/assets/icons/loading.svg'
 import PdfIcon from '@/assets/icons/pdf.svg'
 import VideoIcon from '@/assets/icons/video.svg'
 import ZipIcon from '@/assets/icons/zip.png'
-import DataExpiredIcon from '@/assets/icons/data-expired.png'
-import DownloadIcon from '@/assets/icons/download.svg'
-import LoadingIcon from '@/assets/icons/loading.svg'
-import axios from 'axios'
-import fileDownload from 'js-file-download'
-import { v4 } from 'uuid'
+import Image from 'next/image'
 
 const PreviewPage: NextPage = () => {
   const router = useRouter()
   const { slug } = router.query
   const dataQuery = router.query as any
+  const [loading, setLoading] = useState(true)
 
   const [isExpired, setIsExpired] = useState<boolean>(false)
   const [iconType, setIconType] = useState<any>(ZipIcon)
@@ -31,7 +29,6 @@ const PreviewPage: NextPage = () => {
   const [audioPreviewable, setAudioPreviewable] = useState<boolean>(false)
   const [imagePreviewable, setImagePreviewable] = useState<boolean>(false)
   const [s3AssetUrl, setS3AssetUrl] = useState<string>('')
-  const [isLoading, setIsLoading] = useState<boolean>(false)
 
   useEffect(() => {
     const createdAt = moment(dataQuery['X-Amz-Date'], 'YYYYMMDDHHmmssZ').toDate()
@@ -101,20 +98,34 @@ const PreviewPage: NextPage = () => {
         setIconType(ZipIcon)
         break
     }
+
+    setTimeout(() => {
+      setLoading(false)
+    }, 1000)
   }, [slug])
 
-  const downloadFile = async () => {
-    try {
-      setIsLoading(true)
-      const res = await axios.get(s3AssetUrl, {
-        responseType: 'blob'
-      })
-      setIsLoading(false)
-      const fileName = slug ? (slug as string).replace(/\s/g, '') : v4().slice(0, 10)
-      fileDownload(res.data, fileName)
-    } catch (error) {
-      toast.error('failed to download file')
-    }
+  // const downloadFile = async () => {
+  //   try {
+  //     setIsLoading(true)
+  //     const res = await axios.get(s3AssetUrl, {
+  //       responseType: 'blob'
+  //     })
+  //     setIsLoading(false)
+  //     const fileName = slug ? (slug as string).replace(/\s/g, '') : v4().slice(0, 10)
+  //     fileDownload(res.data, fileName)
+  //   } catch (error) {
+  //     toast.error('failed to download file')
+  //   }
+  // }
+
+  // if()
+
+  if (loading) {
+    return (
+      <div className='absolute top-0 left-0 w-full h-full bg-white bg-opacity-50 flex justify-center items-center'>
+        <Image src={LoadingIcon} alt='Loading' height={120} className='animate-spin max-md:w-[50px]' />
+      </div>
+    )
   }
 
   return (
@@ -150,17 +161,11 @@ const PreviewPage: NextPage = () => {
               className='bg-primary text-white rounded-[10px] py-2 px-6 text-[16px] font-medium flex justify-center items-center gap-2'
               href={s3AssetUrl}
               download={slug || 'file'}
-              // onClick={() => downloadFile()}
             >
               <Image src={DownloadIcon} alt='Download' height={16} />
               Download
             </a>
           </>
-        )}
-        {isLoading && (
-          <div className='absolute top-0 left-0 w-full h-full bg-white bg-opacity-50 flex justify-center items-center'>
-            <Image src={LoadingIcon} alt='Loading' height={120} className='animate-spin max-md:w-[50px]' />
-          </div>
         )}
       </div>
     </Layout>
