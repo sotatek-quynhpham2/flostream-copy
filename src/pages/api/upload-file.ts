@@ -3,7 +3,7 @@ import formidable from 'formidable-serverless'
 import * as fs from 'fs'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-export const progressUpload: {
+const progressUpload: {
   fileName: string
   timeStart: number
   progress: {
@@ -11,6 +11,8 @@ export const progressUpload: {
     loaded: number
   }
 }[] = []
+
+export const getProgress = () => progressUpload
 
 function splitFile(filePath: string, chunkSize: number): Promise<Buffer[]> {
   return new Promise((resolve, reject) => {
@@ -89,6 +91,8 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
 
     const { UploadId } = await createUploadId()
 
+    let indexMax = 0
+
     splitFile(files.file.path, CHUNK_SIZE)
       .then(async (chunks: Buffer[]) => {
         const promises = chunks.map(async (chunk: Buffer, index: number) => {
@@ -105,7 +109,6 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
           const data = await s3.uploadPart(params).promise()
           const indexExist = progressUpload.findIndex((x: any) => x.fileName === files.file.name)
           if (indexExist !== -1) {
-            let indexMax = 1
             if (indexMax < index) {
               indexMax = index
             }
