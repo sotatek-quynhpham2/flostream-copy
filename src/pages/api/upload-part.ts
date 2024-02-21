@@ -1,13 +1,11 @@
-import { NextApiRequest, NextApiResponse } from 'next'
-import formidable from 'formidable-serverless'
 import { S3 } from 'aws-sdk'
-// import ENV from '@/utils/server-config'
+import formidable from 'formidable-serverless'
+import { NextApiRequest, NextApiResponse } from 'next'
 
 export const config = {
   api: {
     bodyParser: false,
     externalResolver: true,
-    // sizeLimit:Infinity
   }
 }
 

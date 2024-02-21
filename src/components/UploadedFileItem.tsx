@@ -1,39 +1,22 @@
 import copyIcon from '@/assets/icons/copy-alt.svg'
 import FileItemIcon from '@/assets/icons/file-item.svg'
 import { bytesToSize, formatTimeUpload } from '@/utils'
-import {
-  BatchItem,
-  FILE_STATES,
-  useItemFinishListener,
-  useItemStartListener,
-  useRequestPreSend
-} from '@rpldy/chunked-uploady'
+import { BatchItem, FILE_STATES, useItemFinishListener, useItemStartListener } from '@rpldy/chunked-uploady'
 import axios from 'axios'
 import copy from 'copy-to-clipboard'
 import Image from 'next/image'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useMemo, useRef, useState } from 'react'
 import { toast } from 'react-toastify'
 
 interface Props {
   fileItem: BatchItem
-  progressList: any
 }
 
-function UploadedFileItem({ fileItem, progressList }: Props) {
+function UploadedFileItem({ fileItem }: Props) {
   const timeStart = useRef(Date.now())
-  const [progress, setProgress] = useState<any>()
+  const [totalTime, setTotalTime] = useState('')
 
-  const progressSeverToS3 = useMemo(() => {
-    return progressList?.[fileItem.file.name]
-  }, [fileItem.file.name, progressList])
-
-  useEffect(() => {
-    if (progressSeverToS3?.percent < 100) {
-      setProgress(progressSeverToS3)
-    }
-  }, [progressSeverToS3])
-
-  useItemStartListener((item) => {
+  useItemStartListener(() => {
     timeStart.current = Date.now()
   }, fileItem.id)
 
@@ -46,24 +29,19 @@ function UploadedFileItem({ fileItem, progressList }: Props) {
   useItemFinishListener(() => {
     const total = fileItem.total / (1024 * 1024)
     const totalTimeToServer = total / uploadSpeedToServer
-    const totalTimeServerToS3 = total / progress?.speed || 0
 
-    setProgress((prev: any) => ({
-      ...prev,
-      percent: 100,
-      totalTime: formatTimeUpload(totalTimeToServer + totalTimeServerToS3)
-    }))
+    setTotalTime(formatTimeUpload(totalTimeToServer))
   }, fileItem.id)
 
   const progressUploadToServer = useMemo(() => {
-    return `${Math.round(fileItem.completed / 2)}`
+    return `${Math.round(fileItem.completed)}`
   }, [fileItem])
 
   const uploadTimeToServer = useMemo(() => {
     const time = (Date.now() - timeStart.current) / 1000
 
     const dataLoaded = fileItem.loaded
-    const fileSize = fileItem.file.size * 2
+    const fileSize = fileItem.file.size
 
     return formatTimeUpload((fileSize / dataLoaded) * time)
   }, [fileItem])
@@ -80,30 +58,6 @@ function UploadedFileItem({ fileItem, progressList }: Props) {
       toast.success('Copied! The presigned url will expire in 24h')
       file.linkPreUrl = url
     } catch (error) {}
-
-    // await fetch('/api/create-presigned-url', {
-    //   method: 'POST',
-    //   body: JSON.stringify({
-    //     objectKey: file.name
-    //   })
-    // }).then((res) => {
-    //   if (res.ok) {
-    //     res.json().then((data) => {
-    //       const slug =
-    //         data.split(process.env.NEXT_PUBLIC_STORE_ENDPOINT + `/${process.env.NEXT_PUBLIC_STORE_BUCKET}/`).pop() +
-    //         `&size=${file.size}`
-
-    //       const url = `${window.location.origin}/shared/${process.env.NEXT_PUBLIC_STORE_BUCKET}/${slug}`
-    //       navigator.clipboard.writeText(url)
-    //       toast.success('Copied! The presigned url will expire in 24h')
-    //       file.linkPreUrl = url
-    //     })
-    //   } else {
-    //     res.json().then((data) => {
-    //       toast.error(data.message)
-    //     })
-    //   }
-    // })
   }
 
   return (
@@ -116,7 +70,7 @@ function UploadedFileItem({ fileItem, progressList }: Props) {
         <div>
           <div className='bg-transparent rounded-full  border h-5px] border-primary w-4/5 '>
             <div
-              style={{ width: `${progress?.percent || progressUploadToServer}%` }}
+              style={{ width: `${progressUploadToServer}%` }}
               className='bg-primary h-[3px] rounded-r-none rounded-full duration-500'
             ></div>
           </div>
@@ -128,15 +82,15 @@ function UploadedFileItem({ fileItem, progressList }: Props) {
           </div>
           <div className='flex-1 mr-2'>
             <div>Progress</div>
-            <div>{progress?.percent || progressUploadToServer} %</div>
+            <div>{progressUploadToServer} %</div>
           </div>
           <div className='flex-1 mr-2'>
             <div>Time</div>
-            <div>{progress?.totalTime || uploadTimeToServer}</div>
+            <div>{totalTime || uploadTimeToServer}</div>
           </div>
           <div className='flex-1 mr-2'>
             <div>Rate</div>
-            <div>{progress?.speed?.toFixed(2) || uploadSpeedToServer?.toFixed(2)}MB/s</div>
+            <div>{uploadSpeedToServer?.toFixed(2)}MB/s</div>
           </div>
         </div>
       </div>

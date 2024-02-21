@@ -145,6 +145,7 @@ const UploadForm = ({ fileList, setFileList, isLoading, setIsLoading, uploadId, 
       const fileName = fileRawList.map((item) => item.file.name)
 
       try {
+        setIsLoading(true)
         const uploadIds = await Promise.all(
           fileName.map((name) => {
             return axios.post('/api/upload-id', {
@@ -154,7 +155,8 @@ const UploadForm = ({ fileList, setFileList, isLoading, setIsLoading, uploadId, 
         )
 
         setUploadId(uploadIds.map((x: any) => ({ fileName: x.data.data.Key, uploadId: x.data.data.UploadId })))
-        await sleep(2000)
+        setIsLoading(false)
+        await sleep(1000)
         upload(fileRawList.map((x) => x.file))
       } catch (error) {}
     }
