@@ -56,11 +56,13 @@ const UploadInfo = ({ isLoading, fileList }: Props) => {
         </div>
       )}
 
-      <div className=' rounded-xl px-5 py-4 flex flex-col gap-[10px] max-h-[700px] overflow-y-auto list-file'>
-        {fileList.map((fileItem) => (
-          <UploadedFileItem progressList={progressList} key={fileItem.id} fileItem={fileItem} />
-        ))}
-      </div>
+      {!isLoading && (
+        <div className=' rounded-xl px-5 py-4 flex flex-col gap-[10px] max-h-[700px] overflow-y-auto list-file'>
+          {fileList.map((fileItem) => (
+            <UploadedFileItem progressList={progressList} key={fileItem.id} fileItem={fileItem} />
+          ))}
+        </div>
+      )}
     </div>
   )
 }
