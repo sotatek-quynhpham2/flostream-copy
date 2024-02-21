@@ -1,49 +1,58 @@
 import copyIcon from '@/assets/icons/copy-alt.svg'
 import FileItemIcon from '@/assets/icons/file-item.svg'
+import { FileItem } from '@/types'
 import { bytesToSize, formatTimeUpload } from '@/utils'
-import { BatchItem, FILE_STATES, useItemFinishListener, useItemStartListener } from '@rpldy/chunked-uploady'
+import { FILE_STATES, useItemFinishListener, useItemStartListener } from '@rpldy/chunked-uploady'
 import axios from 'axios'
 import copy from 'copy-to-clipboard'
 import Image from 'next/image'
-import { useMemo, useRef, useState } from 'react'
+import { Dispatch, SetStateAction, useCallback, useMemo, useRef } from 'react'
 import { toast } from 'react-toastify'
 
 interface Props {
-  fileItem: BatchItem
+  fileItem: FileItem
+  setFileList: Dispatch<SetStateAction<FileItem[]>>
 }
 
-function UploadedFileItem({ fileItem }: Props) {
+function UploadedFileItem({ fileItem, setFileList }: Props) {
   const timeStart = useRef(Date.now())
-  const [totalTime, setTotalTime] = useState('')
 
   useItemStartListener(() => {
     timeStart.current = Date.now()
   }, fileItem.id)
 
-  const uploadSpeedToServer = useMemo(() => {
+  const calcSpeedTime = useCallback(() => {
     const time = (Date.now() - timeStart.current) / 1000
     const dataLoaded = fileItem.loaded / (1024 * 1024)
-    return dataLoaded / time
+    const fileSize = fileItem.file.size / (1024 * 1024)
+
+    return {
+      speed: dataLoaded / time,
+      totalTime: formatTimeUpload((fileSize / dataLoaded) * time)
+    }
   }, [fileItem])
 
-  useItemFinishListener(() => {
-    const total = fileItem.total / (1024 * 1024)
-    const totalTimeToServer = total / uploadSpeedToServer
+  const statisticsUploading = useMemo(() => {
+    if (fileItem.completed === 100) return null
+    return calcSpeedTime()
+  }, [calcSpeedTime, fileItem.completed])
 
-    setTotalTime(formatTimeUpload(totalTimeToServer))
+  useItemFinishListener((finishedItem) => {
+    setFileList((prev) =>
+      prev.map((item) => {
+        if (item.id === fileItem.id) {
+          return {
+            ...finishedItem,
+            ...calcSpeedTime()
+          }
+        }
+        return item
+      })
+    )
   }, fileItem.id)
 
   const progressUploadToServer = useMemo(() => {
     return `${Math.round(fileItem.completed)}`
-  }, [fileItem])
-
-  const uploadTimeToServer = useMemo(() => {
-    const time = (Date.now() - timeStart.current) / 1000
-
-    const dataLoaded = fileItem.loaded
-    const fileSize = fileItem.file.size
-
-    return formatTimeUpload((fileSize / dataLoaded) * time)
   }, [fileItem])
 
   const shareFile = async (file: any) => {
@@ -86,11 +95,11 @@ function UploadedFileItem({ fileItem }: Props) {
           </div>
           <div className='flex-1 mr-2'>
             <div>Time</div>
-            <div>{totalTime || uploadTimeToServer}</div>
+            <div>{fileItem.totalTime || statisticsUploading?.totalTime}</div>
           </div>
           <div className='flex-1 mr-2'>
             <div>Rate</div>
-            <div>{uploadSpeedToServer?.toFixed(2)}MB/s</div>
+            <div>{(fileItem.speed || statisticsUploading?.speed)?.toFixed(2)}MB/s</div>
           </div>
         </div>
       </div>

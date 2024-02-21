@@ -14,11 +14,9 @@ import {
   useItemAbortListener,
   useItemFinishListener,
   useItemProgressListener,
-  useItemStartListener,
-  useRequestPreSend,
   useUploadyContext
 } from '@rpldy/chunked-uploady'
-import axios, { AxiosHeaders } from 'axios'
+import axios from 'axios'
 import BigNumber from 'bignumber.js'
 import JSZip from 'jszip'
 import Image from 'next/image'
@@ -37,7 +35,7 @@ interface UploadFormProps {
 
 const limitSize = new BigNumber(20).times(Math.pow(2, 30))
 
-const UploadForm = ({ fileList, setFileList, isLoading, setIsLoading, uploadId, setUploadId }: UploadFormProps) => {
+const UploadForm = ({ setFileList, isLoading, setIsLoading, uploadId, setUploadId }: UploadFormProps) => {
   const { upload } = useUploadyContext()
   const inputFileRef = useRef<HTMLInputElement | null>(null)
   const [fileRawList, setFileRawList] = useState<{ id: string; file: File }[]>([])
@@ -114,12 +112,12 @@ const UploadForm = ({ fileList, setFileList, isLoading, setIsLoading, uploadId, 
       })
     } catch (error) {}
 
-    setFileList((list) => {
-      const newList = [...list]
-      const index = list.findIndex((x) => x.id === item.id)
-      newList[index] = item
-      return newList
-    })
+    // setFileList((list) => {
+    //   const newList = [...list]
+    //   const index = list.findIndex((x) => x.id === item.id)
+    //   newList[index] = item
+    //   return newList
+    // })
   })
 
   useItemProgressListener((item) => {
@@ -139,11 +137,20 @@ const UploadForm = ({ fileList, setFileList, isLoading, setIsLoading, uploadId, 
     if (isCompressed) {
       setIsLoading(true)
       const fileZip = await compressFiles()
-      setIsLoading(false)
-      upload(fileZip)
+
+      try {
+        const res = await axios.post('/api/upload-id', {
+          fileName: fileZip.name
+        })
+        setUploadId((prev) => [...prev, { fileName: res.data.data.Key, uploadId: res.data.data.UploadId }])
+        await sleep(1000)
+        setIsLoading(false)
+        upload(fileZip)
+      } catch (error) {
+        setIsLoading(false)
+      }
     } else {
       const fileName = fileRawList.map((item) => item.file.name)
-
       try {
         setIsLoading(true)
         const uploadIds = await Promise.all(
@@ -154,11 +161,16 @@ const UploadForm = ({ fileList, setFileList, isLoading, setIsLoading, uploadId, 
           })
         )
 
-        setUploadId(uploadIds.map((x: any) => ({ fileName: x.data.data.Key, uploadId: x.data.data.UploadId })))
+        setUploadId((prev) => [
+          ...prev,
+          ...uploadIds.map((x: any) => ({ fileName: x.data.data.Key, uploadId: x.data.data.UploadId }))
+        ])
         setIsLoading(false)
         await sleep(1000)
         upload(fileRawList.map((x) => x.file))
-      } catch (error) {}
+      } catch (error) {
+        setIsLoading(false)
+      }
     }
   }
 
