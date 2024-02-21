@@ -21,3 +21,11 @@ export function renameFile(originalFile: File, newName: string) {
     lastModified: originalFile.lastModified
   })
 }
+
+export function sleep(time = 2000) {
+  return new Promise((rel, rej) => {
+    setTimeout(() => {
+      rel(true)
+    }, time)
+  })
+}

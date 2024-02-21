@@ -1,3 +1,4 @@
+import ENV from '@/utils/server-config'
 import { S3 } from 'aws-sdk'
 import formidable from 'formidable-serverless'
 import * as fs from 'fs'
@@ -45,19 +46,13 @@ export const config = {
 }
 
 async function POST(req: NextApiRequest, res: NextApiResponse) {
-  const accessKeyId = process.env.NEXT_PUBLIC_STORE_ACCESS_KEY_ID
-  const secretAccessKey = process.env.NEXT_PUBLIC_STORE_SECRET_ACCESS_KEY
-  const region = process.env.NEXT_PUBLIC_STORE_REGION
-  const endPoint = process.env.NEXT_PUBLIC_STORE_ENDPOINT
-  const bucketName = process.env.NEXT_PUBLIC_STORE_BUCKET
-
   const s3 = new S3({
-    endpoint: endPoint,
+    endpoint: ENV.endpoint,
     s3ForcePathStyle: true,
-    region: region,
+    region: ENV.region,
     credentials: {
-      accessKeyId: accessKeyId as string,
-      secretAccessKey: secretAccessKey as string
+      accessKeyId: ENV.accessKeyId,
+      secretAccessKey: ENV.secretAccessKey
     }
   })
 
@@ -78,7 +73,7 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
       new Promise<S3.CreateMultipartUploadOutput>((rel, rej) => {
         s3.createMultipartUpload(
           {
-            Bucket: bucketName as string,
+            Bucket: ENV.bucketName,
             Key: files.file.name,
             ContentType: files.file.type
           },
@@ -99,7 +94,7 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
           const partNumber = index + 1
           const params: AWS.S3.UploadPartRequest = {
             Body: chunk,
-            Bucket: bucketName as string,
+            Bucket: ENV.bucketName,
             Key: files.file.name,
             PartNumber: partNumber,
             UploadId: UploadId as string
@@ -133,7 +128,7 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
         // Complete the multipart upload
         await s3
           .completeMultipartUpload({
-            Bucket: bucketName as string,
+            Bucket: ENV.bucketName,
             Key: files.file.name as string,
             UploadId: UploadId as string,
             MultipartUpload: { Parts: parts }

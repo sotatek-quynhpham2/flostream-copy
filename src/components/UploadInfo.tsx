@@ -19,21 +19,21 @@ const UploadInfo = ({ isLoading, fileList }: Props) => {
   const isFinished = useMemo(() => fileList.every((item) => item.state === FILE_STATES.FINISHED), [fileList])
   const startInterval = useMemo(() => fileList.some((x) => x.completed > 80), [fileList])
 
-  useEffect(() => {
-    if (startInterval && !intervalRef.current) {
-      intervalRef.current = setInterval(() => {
-        axios.get('/api/progress-upload-file').then((res) => {
-          setProgressList(res.data.data)
-        })
-      }, 1000)
-    }
+  // useEffect(() => {
+  //   if (startInterval && !intervalRef.current) {
+  //     intervalRef.current = setInterval(() => {
+  //       axios.get('/api/progress-upload-file').then((res) => {
+  //         setProgressList(res.data.data)
+  //       })
+  //     }, 1000)
+  //   }
 
-    return () => {
-      if (intervalRef.current) {
-        clearInterval(intervalRef.current)
-      }
-    }
-  }, [startInterval])
+  //   return () => {
+  //     if (intervalRef.current) {
+  //       clearInterval(intervalRef.current)
+  //     }
+  //   }
+  // }, [startInterval])
 
   useEffect(() => {
     if (isFinished) {
