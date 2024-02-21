@@ -5,15 +5,20 @@ import FilePlusIcon from '@/assets/icons/file-plus.svg'
 import ReloadIcon from '@/assets/icons/reload.svg'
 import SendIcon from '@/assets/icons/send.svg'
 import TrashIcon from '@/assets/icons/trash.svg'
-import { bytesToSize, renameFile } from '@/utils'
+import { UploadIdItem } from '@/types'
+import { bytesToSize, renameFile, sleep } from '@/utils'
 import {
   BatchItem,
   useBatchAddListener,
+  useChunkStartListener,
   useItemAbortListener,
   useItemFinishListener,
   useItemProgressListener,
+  useItemStartListener,
+  useRequestPreSend,
   useUploadyContext
 } from '@rpldy/chunked-uploady'
+import axios, { AxiosHeaders } from 'axios'
 import BigNumber from 'bignumber.js'
 import JSZip from 'jszip'
 import Image from 'next/image'
@@ -26,11 +31,13 @@ interface UploadFormProps {
   setFileList: Dispatch<SetStateAction<BatchItem[]>>
   isLoading: boolean
   setIsLoading: Dispatch<SetStateAction<boolean>>
+  uploadId: UploadIdItem[]
+  setUploadId: Dispatch<SetStateAction<UploadIdItem[]>>
 }
 
 const limitSize = new BigNumber(20).times(Math.pow(2, 30))
 
-const UploadForm = ({ fileList, setFileList, isLoading, setIsLoading }: UploadFormProps) => {
+const UploadForm = ({ fileList, setFileList, isLoading, setIsLoading, uploadId, setUploadId }: UploadFormProps) => {
   const { upload } = useUploadyContext()
   const inputFileRef = useRef<HTMLInputElement | null>(null)
   const [fileRawList, setFileRawList] = useState<{ id: string; file: File }[]>([])
@@ -60,19 +67,53 @@ const UploadForm = ({ fileList, setFileList, isLoading, setIsLoading }: UploadFo
     }
   }
 
+  useChunkStartListener((data) => {
+    const uploadItem = uploadId.find((x) => x.fileName === data.item.file.name)
+
+    const sendOptions = {
+      ...data.sendOptions,
+      params: {
+        partNumber: data.chunk.index + 1,
+        fileName: data.item.file.name,
+        uploadId: uploadItem?.uploadId
+      }
+    }
+    return {
+      sendOptions
+    }
+  })
+
   const hasFileUploaded = useMemo(() => fileRawList.length > 0, [fileRawList])
 
   useBatchAddListener((batch) => {
     setFileList((list) => list.concat(batch?.items || []))
   })
 
-  useItemFinishListener((item) => {
+  useItemFinishListener(async (item) => {
     if (isCompressed) {
       setFileRawList([])
       setIsCompressed(false)
     } else {
       setFileRawList((list) => list.filter((x) => x.file.name !== item.file.name))
     }
+
+    const uploadItem = uploadId.find((x) => x.fileName === item.file.name)
+
+    const parts = item.uploadResponse.results
+      .map((x: any) => ({
+        ETag: x.data.ETag,
+        PartNumber: x.data.partNumber
+      }))
+      .sort((a: any, b: any) => a.PartNumber - b.PartNumber)
+
+    try {
+      await axios.post('/api/complete-upload', {
+        parts,
+        key: item.file.name,
+        UploadId: uploadItem?.uploadId
+      })
+    } catch (error) {}
+
     setFileList((list) => {
       const newList = [...list]
       const index = list.findIndex((x) => x.id === item.id)
@@ -101,7 +142,21 @@ const UploadForm = ({ fileList, setFileList, isLoading, setIsLoading }: UploadFo
       setIsLoading(false)
       upload(fileZip)
     } else {
-      upload(fileRawList.map((x) => x.file))
+      const fileName = fileRawList.map((item) => item.file.name)
+
+      try {
+        const uploadIds = await Promise.all(
+          fileName.map((name) => {
+            return axios.post('/api/upload-id', {
+              fileName: name
+            })
+          })
+        )
+
+        setUploadId(uploadIds.map((x: any) => ({ fileName: x.data.data.Key, uploadId: x.data.data.UploadId })))
+        await sleep(2000)
+        upload(fileRawList.map((x) => x.file))
+      } catch (error) {}
     }
   }
 

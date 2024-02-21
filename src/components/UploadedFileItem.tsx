@@ -1,7 +1,13 @@
 import copyIcon from '@/assets/icons/copy-alt.svg'
 import FileItemIcon from '@/assets/icons/file-item.svg'
 import { bytesToSize, formatTimeUpload } from '@/utils'
-import { BatchItem, FILE_STATES, useItemFinishListener, useItemStartListener } from '@rpldy/uploady'
+import {
+  BatchItem,
+  FILE_STATES,
+  useItemFinishListener,
+  useItemStartListener,
+  useRequestPreSend
+} from '@rpldy/chunked-uploady'
 import axios from 'axios'
 import copy from 'copy-to-clipboard'
 import Image from 'next/image'
