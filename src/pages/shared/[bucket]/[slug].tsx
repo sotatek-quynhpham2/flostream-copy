@@ -3,7 +3,7 @@ import { bytesToSize } from '@/utils'
 import moment from 'moment'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'react-toastify'
 
 import AudioIcon from '@/assets/icons/audio.png'
@@ -16,6 +16,9 @@ import PdfIcon from '@/assets/icons/pdf.svg'
 import VideoIcon from '@/assets/icons/video.svg'
 import ZipIcon from '@/assets/icons/zip.png'
 import Image from 'next/image'
+import axios from 'axios'
+import fileDownload from 'js-file-download'
+import { v4 } from 'uuid'
 
 const PreviewPage: NextPage = () => {
   const router = useRouter()
@@ -104,21 +107,22 @@ const PreviewPage: NextPage = () => {
     }, 1000)
   }, [slug])
 
-  // const downloadFile = async () => {
-  //   try {
-  //     setIsLoading(true)
-  //     const res = await axios.get(s3AssetUrl, {
-  //       responseType: 'blob'
-  //     })
-  //     setIsLoading(false)
-  //     const fileName = slug ? (slug as string).replace(/\s/g, '') : v4().slice(0, 10)
-  //     fileDownload(res.data, fileName)
-  //   } catch (error) {
-  //     toast.error('failed to download file')
-  //   }
-  // }
+  const downloadFile = async () => {
+    try {
+      const res = await axios.get(s3AssetUrl, {
+        responseType: 'blob'
+      })
+      const fileName = slug ? (slug as string).replace(/\s/g, '') : v4().slice(0, 10)
+      fileDownload(res.data, fileName)
+    } catch (error) {
+      toast.error('failed to download file')
+    }
+  }
 
-  // if()
+  const isMedia = useMemo(
+    () => videoPreviewable || imagePreviewable || audioPreviewable,
+    [videoPreviewable, audioPreviewable, imagePreviewable]
+  )
 
   if (loading) {
     return (
@@ -157,14 +161,23 @@ const PreviewPage: NextPage = () => {
               <div className='text-neutral-2 text-[14px] font-normal leading-normal'>No preview available</div>
             )}
 
-            <a
-              className='bg-primary text-white rounded-[10px] py-2 px-6 text-[16px] font-medium flex justify-center items-center gap-2'
-              href={s3AssetUrl}
-              download={slug || 'file'}
-            >
-              <Image src={DownloadIcon} alt='Download' height={16} />
-              Download
-            </a>
+            {isMedia ? (
+              <button
+                onClick={downloadFile}
+                className='bg-primary text-white rounded-[10px] py-2 px-6 text-[16px] font-medium flex justify-center items-center gap-2'
+              >
+                Download
+              </button>
+            ) : (
+              <a
+                className='bg-primary text-white rounded-[10px] py-2 px-6 text-[16px] font-medium flex justify-center items-center gap-2'
+                href={s3AssetUrl}
+                download={slug || 'file'}
+              >
+                <Image src={DownloadIcon} alt='Download' height={16} />
+                Download
+              </a>
+            )}
           </>
         )}
       </div>
