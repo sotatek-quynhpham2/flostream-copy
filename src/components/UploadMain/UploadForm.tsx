@@ -72,7 +72,6 @@ const UploadForm = ({ setFileList, isLoading, setIsLoading, uploadId, setUploadI
       ...data.sendOptions,
       params: {
         partNumber: data.chunk.index + 1,
-        fileName: data.item.file.name,
         uploadId: uploadItem?.uploadId
       }
     }

@@ -1,11 +1,12 @@
 import { S3 } from 'aws-sdk'
 import formidable from 'formidable-serverless'
+import fs from 'fs'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 export const config = {
   api: {
     bodyParser: false,
-    externalResolver: true,
+    externalResolver: true
   }
 }
 
@@ -17,10 +18,7 @@ const ENV = {
   endpoint: process.env.NEXT_PUBLIC_STORE_ENDPOINT as string
 }
 
-
 async function POST(req: NextApiRequest, res: NextApiResponse) {
-
-
   const form = new formidable.IncomingForm({
     maxFileSize: 20 * 1024 * 1024 * 1024, // 20 GB
     allowEmptyFiles: false
@@ -41,24 +39,26 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
       throw error
     }
 
-   const {fileName, partNumber, uploadId} = fields
+    const chunkData = fs.readFileSync(files.file.path)
+
+    const { partNumber, uploadId } = fields
 
     const params: AWS.S3.UploadPartRequest = {
-      Body: fileName,
+      Body: chunkData,
       Bucket: ENV.bucketName,
       Key: files.file.name,
       PartNumber: Number(partNumber),
       UploadId: uploadId
     }
 
-  try {
-    const data = await s3.uploadPart(params).promise()
-    res.status(200).json({...data,  partNumber: Number(partNumber)})
-  } catch (error) {
-    console.log(error);
-    
-    res.status(400).json({msg: 'fail'})
-  }
+    try {
+      const data = await s3.uploadPart(params).promise()
+      res.status(200).json({ ...data, partNumber: Number(partNumber) })
+    } catch (error) {
+      console.log(error)
+
+      res.status(400).json({ msg: 'fail' })
+    }
   })
 }
 

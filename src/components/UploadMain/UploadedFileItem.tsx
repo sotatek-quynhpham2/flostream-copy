@@ -33,9 +33,8 @@ function UploadedFileItem({ fileItem, setFileList }: Props) {
   }, [fileItem])
 
   const statisticsUploading = useMemo(() => {
-    if (fileItem.completed === 100) return null
     return calcSpeedTime()
-  }, [calcSpeedTime, fileItem.completed])
+  }, [calcSpeedTime])
 
   useItemFinishListener((finishedItem) => {
     setFileList((prev) =>
@@ -95,11 +94,11 @@ function UploadedFileItem({ fileItem, setFileList }: Props) {
           </div>
           <div className='flex-1 mr-2'>
             <div>Time</div>
-            <div>{fileItem.totalTime || statisticsUploading?.totalTime}</div>
+            <div>{fileItem.totalTime || statisticsUploading?.totalTime || '1'}</div>
           </div>
           <div className='flex-1 mr-2'>
             <div>Rate</div>
-            <div>{(fileItem.speed || statisticsUploading?.speed)?.toFixed(2)}MB/s</div>
+            <div>{(fileItem.speed || statisticsUploading?.speed || 1)?.toFixed(2)}MB/s</div>
           </div>
         </div>
       </div>
