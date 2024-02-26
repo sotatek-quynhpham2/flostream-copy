@@ -43,6 +43,11 @@ const UploadForm = ({ setFileList, isLoading, setIsLoading, uploadId, setUploadI
 
   const onFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const files = event.target?.files
+    validateFile(files)
+    event.target.value = ''
+  }
+
+  const validateFile = (files: FileList | null) => {
     const filesList: { id: string; file: File }[] = []
     let valid = true
     if (files) {
@@ -61,7 +66,6 @@ const UploadForm = ({ setFileList, isLoading, setIsLoading, uploadId, setUploadI
         return toast.error('file size must less than 20GB')
       }
       setFileRawList(filesList)
-      event.target.value = ''
     }
   }
 
@@ -206,6 +210,14 @@ const UploadForm = ({ setFileList, isLoading, setIsLoading, uploadId, setUploadI
 
       <div
         className='mt-3 border border-dashed border-primary rounded-xl bg-[#ffe9e140] p-[30px] flex flex-col justify-center items-center cursor-pointer'
+        onDrag={(e) => e.preventDefault()}
+        onDragOver={(e) => {
+          e.preventDefault()
+        }}
+        onDrop={(e) => {
+          e.preventDefault()
+          validateFile(e.dataTransfer.files)
+        }}
         onClick={() => (isLoading ? () => {} : inputFileRef.current?.click())}
       >
         <Image src={FilePlusIcon} width={48} height={48} alt='FilePlusIcon' />
