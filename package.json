@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "[ -e .env ] && set -a && . ./.env; next dev",
     "build": "next build",
-    "start": "[ -e .env ] && set -a && . ./.env; next start",
+    "start": "[ -e .env ] && set -a && . ./.env; next start -H 0.0.0.0 -p 4111",
     "lint": "next lint"
   },
   "dependencies": {
@@ -14,7 +14,7 @@
     "@rpldy/chunked-uploady": "^1.7.1",
     "@rpldy/upload-button": "^1.7.1",
     "@rpldy/uploady": "^1.7.1",
-    "aws-sdk": "^2.1560.0",
+    "aws-sdk": "^2.1574.0",
     "axios": "^1.6.4",
     "bignumber.js": "4.0.4",
     "copy-to-clipboard": "^3.3.3",

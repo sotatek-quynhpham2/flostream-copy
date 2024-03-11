@@ -71,7 +71,8 @@ const UploadForm = ({ setFileList, isLoading, setIsLoading, uploadId, setUploadI
 
   useChunkStartListener((data) => {
     const uploadItem = uploadId.find((x) => x.fileName === data.item.file.name)
-
+    console.log('useChunkStartListener', uploadItem, data);
+    
     const sendOptions = {
       ...data.sendOptions,
       params: {
@@ -155,6 +156,8 @@ const UploadForm = ({ setFileList, isLoading, setIsLoading, uploadId, setUploadI
     } else {
       const fileName = fileRawList.map((item) => item.file.name)
       try {
+        console.log(33333);
+        
         setIsLoading(true)
         const uploadIds = await Promise.all(
           fileName.map((name) => {

@@ -22,9 +22,13 @@ const ENV = {
   bucketName: process.env.NEXT_PUBLIC_STORE_BUCKET as string,
   endpoint: process.env.NEXT_PUBLIC_STORE_ENDPOINT as string
 }
+console.log("bucketName", ENV);
+
 
 async function POST(req: getUploadIdApiRequest, res: NextApiResponse) {
   const { fileName, contentType } = req.body
+  console.log("body", req.body);
+  
 
   const s3 = new S3({
     endpoint: ENV.endpoint,
@@ -41,14 +45,17 @@ async function POST(req: getUploadIdApiRequest, res: NextApiResponse) {
       msg: 'filename and contentType is required'
     })
   }
-
-  s3.createMultipartUpload(
+  
+  await s3.createMultipartUpload(
     {
       Bucket: ENV.bucketName,
-      Key: fileName
-      // ContentType: contentType
+      Key: fileName,
+      ContentType: contentType
     },
     (err, data) => {
+      console.log("err", err);
+      console.log("data", data);
+      
       if (err) {
         return res.status(400).json({
           msg: 'filename and contentType is required'
